@@ -364,45 +364,5 @@
         qtyDiv.className = 'cart-item-qty';
         qtyDiv.textContent = `x${item.quantity}`;
 
-        const priceDiv = document.createElement('div');
-        priceDiv.className = 'cart-item-price';
-        priceDiv.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
-
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '×';
-        removeBtn.title = 'Remove item';
-        removeBtn.onclick = () => {
-          removeFromCart(item.name);
-        };
-
-        itemDiv.appendChild(nameDiv);
-        itemDiv.appendChild(qtyDiv);
-        itemDiv.appendChild(priceDiv);
-        itemDiv.appendChild(removeBtn);
-
-        cartItemsContainer.appendChild(itemDiv);
-      });
-
-      cartTotal.textContent = `Total: $${total.toFixed(2)}`;
-      cartCount.textContent = totalItems;
-    }
-
-    function addToCart(name, price) {
-      const existingItem = cart.find(item => item.name === name);
-      if (existingItem) {
-        existingItem.quantity++;
-      } else {
-        cart.push({ name, price, quantity: 1 });
-      }
-      updateCartUI();
-      openCart();
-    }
-
-    function removeFromCart(name) {
-      cart = cart.filter(item => item.name !== name);
-      updateCartUI();
-    }
-
-    function openCart() {
-      cartSidebar
+        const priceDiv = document.createElement('div
 
