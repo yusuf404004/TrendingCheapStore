@@ -2,275 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Starter Shop</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background: #000;
-      border-bottom: 1px solid #333;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 1rem;
-    }
-
-    button {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-
-    #sideMenu,
-    #cart {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      width: 300px;
-      background: #222;
-      color: white;
-      padding: 1rem;
-      overflow-y: auto;
-      z-index: 1000;
-      transform: translateX(-100%);
-      transition: transform 0.3s;
-    }
-
-    #cart {
-      right: 0;
-      left: auto;
-      transform: translateX(100%);
-    }
-
-    #sideMenu.open {
-      transform: translateX(0%);
-    }
-
-    #cart.open {
-      transform: translateX(0%);
-    }
-
-    #main {
-      padding: 1rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
-      gap: 1rem;
-    }
-
-    .product {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .product:hover {
-      transform: scale(1.03);
-    }
-
-    .product img {
-      width: 100%;
-      max-height: 150px;
-      object-fit: contain;
-      margin-bottom: 0.5rem;
-    }
-
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-
-    .modal.open {
-      display: flex;
-    }
-
-    .modal-content {
-      background: #fff;
-      color: #000;
-      padding: 2rem;
-      border-radius: 10px;
-      max-width: 500px;
-      width: 100%;
-    }
-
-    .modal-content button {
-      background: black;
-      color: white;
-    }
-
-    .cart-items {
-      margin-top: 1rem;
-    }
-
-    .cart-item {
-      margin-bottom: 1rem;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trending Cheap Store</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <header>
-    <h1>⚽🎮 My Shop</h1>
-    <div class="buttons">
-      <button id="menuBtn">Menu</button>
-      <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
-    </div>
+    <button id="menuBtn">☰ Menu</button>
+    <h1>Trending Cheap Store</h1>
+    <button id="cartBtn">🛒 Cart</button>
   </header>
 
-  <div id="sideMenu">
-    <h2>Categories</h2>
+  <aside id="sidebar" class="hidden">
     <ul>
-      <li><button onclick="filterProducts('all')">All</button></li>
-      <li><button onclick="filterProducts('football')">Football</button></li>
-      <li><button onclick="filterProducts('gaming')">Gaming</button></li>
+      <li onclick="filterProducts('all')">All</li>
+      <li onclick="filterProducts('football')">Football</li>
+      <li onclick="filterProducts('gaming')">Gaming</li>
     </ul>
-  </div>
+  </aside>
 
-  <div id="cart">
+  <main id="productList"></main>
+
+  <div id="cart" class="hidden">
     <h2>Your Cart</h2>
-    <div class="cart-items" id="cartItems"></div>
-    <p>Total: $<span id="cartTotal">0.00</span></p>
+    <ul id="cartItems"></ul>
+    <p>Total: $<span id="totalPrice">0</span></p>
   </div>
 
-  <main id="main">
-    <div class="grid" id="productGrid"></div>
-  </main>
-
-  <div class="modal" id="productModal">
-    <div class="modal-content">
-      <h3 id="modalTitle"></h3>
-      <img id="modalImg" src="" alt="" style="width:100%; height:auto;" />
-      <p id="modalDesc"></p>
-      <p><strong>Price: $<span id="modalPrice"></span></strong></p>
-      <button onclick="addToCart()">Add to Cart</button>
-      <button onclick="closeModal()">Close</button>
-    </div>
-  </div>
-
-  <script>
-    const products = [
-      { id: 1, name: "FC Barcelona Jersey", category: "football", price: 89.99, img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020%29_logo.svg", desc: "Official Nike Barcelona Jersey." },
-      { id: 2, name: "Real Madrid Shorts", category: "football", price: 44.99, img: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", desc: "White Adidas shorts." },
-      { id: 3, name: "Roblox 1000 Robux", category: "gaming", price: 9.99, img: "https://upload.wikimedia.org/wikipedia/en/e/e7/Roblox_Logo_2017.svg", desc: "Get 1000 Robux for your account." },
-      { id: 4, name: "Fortnite V-Bucks", category: "gaming", price: 9.99, img: "https://upload.wikimedia.org/wikipedia/en/4/48/Fortnite_Chapter_2_Season_4_Icon.png", desc: "Buy 1000 Fortnite V-Bucks." }
-    ];
-
-    let cart = [];
-    let selectedProduct = null;
-
-    const productGrid = document.getElementById('productGrid');
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartCount = document.getElementById('cartCount');
-    const productModal = document.getElementById('productModal');
-
-    function renderProducts(filter = "all") {
-      productGrid.innerHTML = '';
-      const list = filter === "all" ? products : products.filter(p => p.category === filter);
-      list.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product';
-        card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}" />
-          <h3>${p.name}</h3>
-          <p>$${p.price.toFixed(2)}</p>
-        `;
-        card.onclick = () => showProduct(p);
-        productGrid.appendChild(card);
-      });
-    }
-
-    function showProduct(product) {
-      selectedProduct = product;
-      document.getElementById('modalTitle').textContent = product.name;
-      document.getElementById('modalImg').src = product.img;
-      document.getElementById('modalDesc').textContent = product.desc;
-      document.getElementById('modalPrice').textContent = product.price.toFixed(2);
-      productModal.classList.add('open');
-    }
-
-    function closeModal() {
-      productModal.classList.remove('open');
-    }
-
-    function addToCart() {
-      const existing = cart.find(i => i.id === selectedProduct.id);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({...selectedProduct, qty: 1});
-      }
-      updateCart();
-      closeModal();
-    }
-
-    function updateCart() {
-      cartItems.innerHTML = '';
-      let total = 0;
-      let count = 0;
-      cart.forEach(item => {
-        total += item.price * item.qty;
-        count += item.qty;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `${item.name} x${item.qty}`;
-        cartItems.appendChild(div);
-      });
-      cartTotal.textContent = total.toFixed(2);
-      cartCount.textContent = count;
-    }
-
-    document.getElementById('menuBtn').onclick = () => {
-      document.getElementById('sideMenu').classList.toggle('open');
-    };
-
-    document.getElementById('cartBtn').onclick = () => {
-      document.getElementById('cart').classList.toggle('open');
-    };
-
-    function filterProducts(cat) {
-      renderProducts(cat);
-      document.getElementById('sideMenu').classList.remove('open');
-    }
-
-    renderProducts();
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
