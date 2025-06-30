@@ -3,223 +3,166 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TrendingCheapStore</title>
+<title>Simple Shop</title>
 <style>
-  /* Reset & base */
-  * {
-    box-sizing: border-box;
+  :root {
+    --bg-light: #fff;
+    --fg-light: #000;
+    --bg-dark: #121212;
+    --fg-dark: #eee;
+    --primary: #444;
+  }
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: var(--bg-dark);
+      color: var(--fg-dark);
+    }
+    button {
+      background: var(--primary);
+      color: var(--fg-dark);
+    }
+  }
+  @media (prefers-color-scheme: light) {
+    body {
+      background: var(--bg-light);
+      color: var(--fg-light);
+    }
+    button {
+      background: var(--primary);
+      color: var(--fg-light);
+    }
   }
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #fff;
-    color: #000;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  @media (prefers-color-scheme: dark) {
-    body {
-      background: #121212;
-      color: #ddd;
-    }
-    button {
-      background: #222;
-      color: #ddd;
-      border: 1px solid #444;
-    }
-    input, select {
-      background: #222;
-      color: #ddd;
-      border: 1px solid #444;
-    }
-  }
-  /* Layout */
-  #container {
     display: flex;
-    min-height: 100vh;
+    overflow-x: hidden;
   }
-  /* Sidebar */
-  #sidebar {
-    width: 220px;
-    background: #222;
-    color: white;
-    padding: 15px;
-    position: fixed;
-    top: 0; bottom: 0; left: -220px;
-    overflow-y: auto;
-    transition: left 0.3s ease;
-    z-index: 1000;
-  }
-  #sidebar.open {
-    left: 0;
-  }
-  #sidebar h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
-    border-bottom: 1px solid #555;
-    padding-bottom: 5px;
-  }
-  #sidebar button.menu-close {
-    background: transparent;
-    border: none;
-    color: #eee;
-    font-size: 1.4rem;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  #sidebar ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  #sidebar ul li {
-    margin: 8px 0;
-  }
-  #sidebar ul li button {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: white;
-    text-align: left;
-    padding: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  #sidebar ul li button:hover {
-    background: #444;
-  }
-
-  /* Main content */
-  #main {
-    flex-grow: 1;
-    margin-left: 0;
-    padding: 20px;
-    transition: margin-left 0.3s ease;
-  }
-  #main.shifted {
-    margin-left: 220px;
-  }
-
-  /* Menu Button */
   #menuBtn {
     position: fixed;
-    top: 12px;
-    left: 12px;
-    background: #222;
-    color: white;
-    border: none;
-    font-size: 1.5rem;
-    padding: 6px 10px;
+    top: 10px; left: 10px;
+    z-index: 1000;
+    padding: 8px 12px;
     cursor: pointer;
-    z-index: 1100;
-    border-radius: 4px;
   }
-  #menuBtn.hidden {
-    display: none;
+  #sideMenu {
+    position: fixed;
+    top: 0; left: -240px;
+    width: 240px;
+    height: 100vh;
+    background: var(--primary);
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: left 0.3s;
+    overflow-y: auto;
+    z-index: 999;
   }
-
-  /* Search & filters */
-  #searchBar {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  #sideMenu.open {
+    left: 0;
   }
-  #searchBar input[type="text"], #searchBar input[type="number"] {
+  #sideMenu h2 {
+    margin-top: 0;
+  }
+  #sideMenu button.menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  #sideMenu nav button {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    color: white;
+    padding: 8px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  #sideMenu nav button:hover {
+    background: #666;
+  }
+  main {
     flex: 1;
-    min-width: 150px;
-    padding: 6px 8px;
-    font-size: 1rem;
+    margin-left: 0;
+    padding: 50px 20px 20px 20px;
+    transition: margin-left 0.3s;
+    min-height: 100vh;
   }
-  #searchBar label {
-    font-size: 0.9rem;
-    align-self: center;
+  main.menu-open {
+    margin-left: 240px;
   }
-
-  /* Products grid */
-  #products {
+  #searchBar {
+    margin-bottom: 20px;
+  }
+  #searchBar input {
+    padding: 8px;
+    margin-right: 10px;
+    width: 150px;
+  }
+  #productsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
   .product-card {
-    background: #f0f0f0;
-    border-radius: 6px;
+    border: 1px solid #ccc;
     padding: 10px;
-    box-shadow: 0 0 5px rgb(0 0 0 / 0.1);
-    color: #000;
+    background: inherit;
+    color: inherit;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-  }
-  @media (prefers-color-scheme: dark) {
-    .product-card {
-      background: #222;
-      color: #ddd;
-      box-shadow: 0 0 8px rgb(255 255 255 / 0.1);
-    }
   }
   .product-card img {
     max-width: 100%;
-    height: 100px;
+    height: 120px;
     object-fit: contain;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
-  .product-card h4 {
-    margin: 6px 0 4px;
-    font-size: 1.1rem;
+  .product-card h3 {
+    margin: 5px 0;
+    font-size: 16px;
+    text-align: center;
   }
-  .product-card p.desc {
-    font-size: 0.9rem;
-    margin: 4px 0 8px;
-    min-height: 40px;
+  .product-card p {
+    margin: 5px 0;
+    font-size: 14px;
   }
-  .product-card p.price {
-    font-weight: bold;
-    margin: 4px 0 8px;
-  }
-  .product-card button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+  .product-card button.add-to-cart {
+    margin-top: auto;
+    padding: 6px 10px;
     cursor: pointer;
-    font-size: 1rem;
   }
-  .product-card button:hover {
-    background: #0056b3;
-  }
-
-  /* Cart */
   #cart {
     position: fixed;
-    right: 0; top: 0;
+    top: 60px; right: 20px;
     width: 320px;
-    height: 100vh;
-    background: #333;
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #999;
+    background: var(--primary);
     color: white;
     padding: 15px;
     box-sizing: border-box;
-    overflow-y: auto;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 1050;
+    display: none;
+    z-index: 1001;
   }
   #cart.open {
-    transform: translateX(0);
+    display: block;
   }
-  #cart h3 {
+  #cart h2 {
     margin-top: 0;
-  }
-  #cart-items {
-    margin-top: 15px;
+    margin-bottom: 15px;
   }
   .cart-item {
     display: flex;
     align-items: center;
     margin-bottom: 12px;
-    border-bottom: 1px solid #555;
-    padding-bottom: 8px;
   }
   .cart-item img {
     width: 50px;
@@ -227,656 +170,381 @@
     object-fit: contain;
     margin-right: 10px;
   }
-  .cart-item-info {
-    flex-grow: 1;
+  .cart-item-details {
+    flex: 1;
   }
-  .cart-item-info h5 {
-    margin: 0 0 6px;
-    font-size: 1rem;
+  .cart-item-details h4 {
+    margin: 0 0 5px 0;
   }
-  .cart-item-info p {
-    margin: 0;
-    font-size: 0.9rem;
-  }
-  .cart-qty {
+  .qty-controls {
     display: flex;
     align-items: center;
-    gap: 6px;
   }
-  .cart-qty button {
-    background: #555;
+  .qty-controls button {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 1;
+    background: #666;
     border: none;
     color: white;
-    width: 22px;
-    height: 22px;
-    border-radius: 3px;
     cursor: pointer;
-    font-weight: bold;
-    line-height: 1;
   }
-  .cart-qty input {
+  .qty-controls input {
     width: 40px;
     text-align: center;
-    font-size: 1rem;
-    border-radius: 3px;
-    border: none;
-    padding: 2px 4px;
+    margin: 0 5px;
+    font-size: 14px;
   }
-  #cart-total {
+  #cartTotal {
     font-weight: bold;
-    margin-top: 20px;
-    font-size: 1.1rem;
+    margin-top: 10px;
+    text-align: right;
   }
-  #cart-close {
-    background: #444;
+  #closeCartBtn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: none;
     border: none;
     color: white;
-    padding: 6px 10px;
-    width: 100%;
+    font-size: 20px;
     cursor: pointer;
-    margin-top: 10px;
-  }
-
-  /* Background Flag container */
-  #flag-bg {
-    position: fixed;
-    top: 60px;
-    left: 220px;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-    opacity: 0.07;
-    pointer-events: none;
-    transition: background-image 0.5s ease;
-  }
-
-  /* Scrollable country sets container */
-  #football-country-sets {
-    margin-top: 10px;
-  }
-  #football-country-sets h3 {
-    margin-top: 20px;
-    margin-bottom: 8px;
   }
 </style>
 </head>
 <body>
 
-<button id="menuBtn" aria-label="Open menu">☰</button>
+<button id="menuBtn">☰ Menu</button>
 
-<div id="sidebar" aria-label="Main menu">
+<div id="sideMenu" aria-label="Site Navigation" role="navigation">
   <button class="menu-close" aria-label="Close menu">×</button>
   <h2>Categories</h2>
-  <ul>
-    <li><button id="virtualBtn">Virtual</button></li>
-    <li><button id="physicalBtn">Physical</button></li>
-  </ul>
-  <div id="virtualSub" style="display:none; margin-top:10px;">
-    <h3>Virtual Items</h3>
-    <ul>
-      <li><button class="virtual-game" data-game="fortnite">Fortnite Accounts</button></li>
-      <li><button class="virtual-game" data-game="vbucks">V-Bucks</button></li>
-      <li><button class="virtual-game" data-game="roblox">Roblox</button></li>
-      <!-- Add top 10 games similarly -->
-    </ul>
-    <input type="text" id="virtualSearch" placeholder="Search virtual items..." style="width:100%;margin-top:10px;padding:6px;" />
-  </div>
-  <div id="physicalSub" style="display:none; margin-top:10px;">
-    <h3>Physical Items</h3>
-    <ul>
-      <li><button id="footballBtn">Football</button></li>
-      <li><button id="clothingBtn">Clothing</button></li>
-    </ul>
-    <div id="footballSub" style="display:none; margin-top:10px;">
-      <ul>
-        <li><button class="football-category" data-cat="jerseys">Jerseys</button></li>
-        <li><button class="football-category" data-cat="shorts">Shorts</button></li>
-        <li><button class="football-category" data-cat="sets">Sets</button></li>
-      </ul>
-      <div id="footballCountries" style="margin-top:10px;"></div>
-    </div>
-    <div id="clothingSub" style="display:none; margin-top:10px;">
-      <ul>
-        <li><button class="clothing-category" data-cat="socks">Socks</button></li>
-        <li><button class="clothing-category" data-cat="shirts">Shirts</button></li>
-        <li><button class="clothing-category" data-cat="tshirts">T-Shirts</button></li>
-        <li><button class="clothing-category" data-cat="pants">Pants</button></li>
-        <li><button class="clothing-category" data-cat="shorts">Shorts</button></li>
-        <li><button class="clothing-category" data-cat="swimmingshorts">Swimming Shorts</button></li>
-      </ul>
-      <div id="clothingProducts"></div>
-    </div>
-  </div>
+  <nav>
+    <button data-cat="virtual">Virtual</button>
+    <button data-cat="physical">Physical</button>
+  </nav>
+  <div id="subMenu"></div>
 </div>
 
-<div id="flag-bg"></div>
-
-<div id="main" tabindex="0">
-  <h1>Welcome to TrendingCheapStore</h1>
-  <p>Explore virtual and physical products using the menu.  
-     Use the search box to filter products.  
-     Add items to the cart and manage your quantities easily.</p>
-  <div id="searchBar" style="display:none;">
-    <input type="text" id="productSearch" placeholder="Search products by name..." />
-    <label>Price Min <input type="number" id="priceMin" min="0" /></label>
-    <label>Price Max <input type="number" id="priceMax" min="0" /></label>
+<main id="mainContent">
+  <div id="searchBar">
+    <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products" />
+    <input type="number" id="minPrice" placeholder="Min price" min="0" style="width:80px" aria-label="Minimum price" />
+    <input type="number" id="maxPrice" placeholder="Max price" min="0" style="width:80px" aria-label="Maximum price" />
     <button id="clearFilters">Clear Filters</button>
   </div>
-  <div id="products"></div>
-</div>
+  <div id="productsGrid" aria-live="polite" aria-label="Product list"></div>
+</main>
 
-<div id="cart" aria-label="Shopping cart">
-  <h3>Your Cart</h3>
-  <div id="cart-items"></div>
-  <div id="cart-total">Total: $0.00</div>
-  <button id="cart-close">Close Cart</button>
+<div id="cart" aria-label="Shopping cart" role="region" aria-live="polite">
+  <button id="closeCartBtn" aria-label="Close cart">×</button>
+  <h2>Your Cart</h2>
+  <div id="cartItems"></div>
+  <div id="cartTotal"></div>
 </div>
 
 <script>
-  // ===== Data =====
+  const menuBtn = document.getElementById('menuBtn');
+  const sideMenu = document.getElementById('sideMenu');
+  const menuCloseBtn = sideMenu.querySelector('.menu-close');
+  const mainContent = document.getElementById('mainContent');
+  const subMenu = document.getElementById('subMenu');
+  const productsGrid = document.getElementById('productsGrid');
+  const searchInput = document.getElementById('searchInput');
+  const minPrice = document.getElementById('minPrice');
+  const maxPrice = document.getElementById('maxPrice');
+  const clearFiltersBtn = document.getElementById('clearFilters');
+  const cart = document.getElementById('cart');
+  const cartItems = document.getElementById('cartItems');
+  const cartTotal = document.getElementById('cartTotal');
+  const closeCartBtn = document.getElementById('closeCartBtn');
+
+  let cartData = {};
+  let currentCategory = null;
+  let currentSubCategory = null;
+
+  // Sample product data
   const productsData = {
+    virtual: {
+      'Fortnite Accounts': [
+        { id: 'fn1', name: 'Fortnite Account 1', price: 19.99, image: 'https://i.imgur.com/kTsfApe.png' },
+        { id: 'fn2', name: 'Fortnite Account 2', price: 24.99, image: 'https://i.imgur.com/kTsfApe.png' },
+      ],
+      'V-Bucks': [
+        { id: 'vb1', name: '1000 V-Bucks', price: 9.99, image: 'https://i.imgur.com/3j2O2pT.png' },
+        { id: 'vb2', name: '5000 V-Bucks', price: 39.99, image: 'https://i.imgur.com/3j2O2pT.png' },
+      ],
+      Roblox: [
+        { id: 'rb1', name: 'Roblox Game Pass', price: 5.99, image: 'https://i.imgur.com/JsN26OA.png' },
+      ],
+    },
     physical: {
       football: {
         jerseys: [
-          {name:'FC Barcelona Jersey', price:85, image:'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021%29.svg', description:'Official FC Barcelona Jersey.'},
-          {name:'Real Madrid Jersey', price:90, image:'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', description:'Official Real Madrid Jersey.'},
-          {name:'Manchester United Jersey', price:80, image:'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', description:'Official Manchester United Jersey.'},
-          {name:'Liverpool Jersey', price:80, image:'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg', description:'Official Liverpool Jersey.'},
-          {name:'Juventus Jersey', price:75, image:'https://upload.wikimedia.org/wikipedia/en/6/6e/Juventus_FC_2017_logo.svg', description:'Official Juventus Jersey.'},
-          {name:'Bayern Munich Jersey', price:80, image:'https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_Munich_logo_%282017%29.svg', description:'Official Bayern Munich Jersey.'},
-          {name:'Galatasaray Jersey', price:70, image:'https://upload.wikimedia.org/wikipedia/en/b/b3/Galatasaray_S.K._logo.svg', description:'Official Galatasaray Jersey.'},
-          {name:'Fenerbahçe Jersey', price:70, image:'https://upload.wikimedia.org/wikipedia/en/7/7c/Fenerbah%C3%A7e_S.K._logo.svg', description:'Official Fenerbahçe Jersey.'},
-          {name:'Beşiktaş Jersey', price:70, image:'https://upload.wikimedia.org/wikipedia/en/1/10/Besiktas_JK_logo.svg', description:'Official Beşiktaş Jersey.'}
+          { id: 'fbj1', name: 'Barcelona Jersey', price: 69.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020–21%29.png' },
+          { id: 'fbj2', name: 'Real Madrid Jersey', price: 74.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+          { id: 'fbj3', name: 'Liverpool Jersey', price: 65.99, image: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+          { id: 'fbj4', name: 'Fenerbahçe Jersey', price: 59.99, image: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Fenerbahce_Sports_Club_logo.svg' },
+          { id: 'fbj5', name: 'Galatasaray Jersey', price: 59.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/43/Galatasaray_S.K._logo.svg' },
         ],
         shorts: [
-          {name:'FC Barcelona Shorts', price:45, image:'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021%29.svg', description:'Official FC Barcelona Shorts.'},
-          {name:'Real Madrid Shorts', price:50, image:'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', description:'Official Real Madrid Shorts.'},
-          {name:'Manchester United Shorts', price:45, image:'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', description:'Official Manchester United Shorts.'},
-          {name:'Liverpool Shorts', price:45, image:'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg', description:'Official Liverpool Shorts.'},
-          {name:'Juventus Shorts', price:40, image:'https://upload.wikimedia.org/wikipedia/en/6/6e/Juventus_FC_2017_logo.svg', description:'Official Juventus Shorts.'},
-          {name:'Bayern Munich Shorts', price:45, image:'https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_Munich_logo_%282017%29.svg', description:'Official Bayern Munich Shorts.'},
-          {name:'Galatasaray Shorts', price:40, image:'https://upload.wikimedia.org/wikipedia/en/b/b3/Galatasaray_S.K._logo.svg', description:'Official Galatasaray Shorts.'},
-          {name:'Fenerbahçe Shorts', price:40, image:'https://upload.wikimedia.org/wikipedia/en/7/7c/Fenerbah%C3%A7e_S.K._logo.svg', description:'Official Fenerbahçe Shorts.'},
-          {name:'Beşiktaş Shorts', price:40, image:'https://upload.wikimedia.org/wikipedia/en/1/10/Besiktas_JK_logo.svg', description:'Official Beşiktaş Shorts.'}
+          { id: 'fbs1', name: 'Barcelona Shorts', price: 29.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020–21%29.png' },
+          { id: 'fbs2', name: 'Real Madrid Shorts', price: 34.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+          { id: 'fbs3', name: 'Liverpool Shorts', price: 27.99, image: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+          { id: 'fbs4', name: 'Fenerbahçe Shorts', price: 25.99, image: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Fenerbahce_Sports_Club_logo.svg' },
+          { id: 'fbs5', name: 'Galatasaray Shorts', price: 25.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/43/Galatasaray_S.K._logo.svg' },
         ],
         sets: [
-          {name:'FC Barcelona Set', price:120, image:'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021%29.svg', description:'Official FC Barcelona Jersey + Shorts Set.'},
-          {name:'Real Madrid Set', price:130, image:'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', description:'Official Real Madrid Jersey + Shorts Set.'},
-          {name:'Manchester United Set', price:115, image:'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', description:'Official Manchester United Jersey + Shorts Set.'},
-          {name:'Liverpool Set', price:115, image:'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg', description:'Official Liverpool Jersey + Shorts Set.'},
-          {name:'Juventus Set', price:110, image:'https://upload.wikimedia.org/wikipedia/en/6/6e/Juventus_FC_2017_logo.svg', description:'Official Juventus Jersey + Shorts Set.'},
-          {name:'Bayern Munich Set', price:120, image:'https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_Munich_logo_%282017%29.svg', description:'Official Bayern Munich Jersey + Shorts Set.'},
-          {name:'Galatasaray Set', price:100, image:'https://upload.wikimedia.org/wikipedia/en/b/b3/Galatasaray_S.K._logo.svg', description:'Official Galatasaray Jersey + Shorts Set.'},
-          {name:'Fenerbahçe Set', price:100, image:'https://upload.wikimedia.org/wikipedia/en/7/7c/Fenerbah%C3%A7e_S.K._logo.svg', description:'Official Fenerbahçe Jersey + Shorts Set.'},
-          {name:'Beşiktaş Set', price:100, image:'https://upload.wikimedia.org/wikipedia/en/1/10/Besiktas_JK_logo.svg', description:'Official Beşiktaş Jersey + Shorts Set.'}
-        ]
+          { id: 'fbst1', name: 'Barcelona Jersey + Shorts Set', price: 89.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020–21%29.png' },
+          { id: 'fbst2', name: 'Real Madrid Jersey + Shorts Set', price: 94.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+          { id: 'fbst3', name: 'Liverpool Jersey + Shorts Set', price: 85.99, image: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+        ],
       },
       clothing: {
         socks: [
-          {name:'White Socks', price:10, image:'https://upload.wikimedia.org/wikipedia/commons/6/69/White_socks_2004.jpg', description:'Comfortable white socks.'},
-          {name:'Black Socks', price:10, image:'https://upload.wikimedia.org/wikipedia/commons/7/7a/Black_socks_2009.jpg', description:'Comfortable black socks.'},
+          { id: 'clso1', name: 'White Socks', price: 5.99, image: 'https://i.imgur.com/y5b77TZ.png' },
+          { id: 'clso2', name: 'Black Socks', price: 6.99, image: 'https://i.imgur.com/y5b77TZ.png' },
         ],
         shirts: [
-          {name:'White Shirt', price:25, image:'https://upload.wikimedia.org/wikipedia/commons/0/07/White_T-Shirt.jpg', description:'Casual white shirt.'},
-          {name:'Black Shirt', price:25, image:'https://upload.wikimedia.org/wikipedia/commons/e/e9/Black_T-Shirt.jpg', description:'Casual black shirt.'},
+          { id: 'clsh1', name: 'Casual Shirt', price: 29.99, image: 'https://i.imgur.com/WcA7IkZ.png' },
+          { id: 'clsh2', name: 'Formal Shirt', price: 49.99, image: 'https://i.imgur.com/WcA7IkZ.png' },
         ],
         tshirts: [
-          {name:'Graphic T-Shirt', price:20, image:'https://upload.wikimedia.org/wikipedia/commons/3/39/Graphic_T-shirt_2008.jpg', description:'Trendy graphic t-shirt.'},
-          {name:'Plain T-Shirt', price:15, image:'https://upload.wikimedia.org/wikipedia/commons/4/4e/Plain_T-shirt.jpg', description:'Simple plain t-shirt.'},
+          { id: 'clt1', name: 'Plain T-Shirt', price: 14.99, image: 'https://i.imgur.com/YNfy0F9.png' },
+          { id: 'clt2', name: 'Graphic T-Shirt', price: 19.99, image: 'https://i.imgur.com/YNfy0F9.png' },
         ],
         pants: [
-          {name:'Jeans', price:35, image:'https://upload.wikimedia.org/wikipedia/commons/0/0e/Jeans_for_men.jpg', description:'Blue jeans.'},
-          {name:'Black Pants', price:30, image:'https://upload.wikimedia.org/wikipedia/commons/9/97/Black_pants_for_men.jpg', description:'Comfortable black pants.'},
+          { id: 'clp1', name: 'Jeans', price: 39.99, image: 'https://i.imgur.com/kOQqD2k.png' },
+          { id: 'clp2', name: 'Chinos', price: 44.99, image: 'https://i.imgur.com/kOQqD2k.png' },
         ],
         shorts: [
-          {name:'Denim Shorts', price:20, image:'https://upload.wikimedia.org/wikipedia/commons/1/10/Denim_shorts.jpg', description:'Cool denim shorts.'},
-          {name:'Sports Shorts', price:18, image:'https://upload.wikimedia.org/wikipedia/commons/4/45/Sports_shorts.jpg', description:'Light sports shorts.'},
+          { id: 'clshrt1', name: 'Casual Shorts', price: 24.99, image: 'https://i.imgur.com/Deqk4xz.png' },
+          { id: 'clshrt2', name: 'Sports Shorts', price: 27.99, image: 'https://i.imgur.com/Deqk4xz.png' },
         ],
-        swimmingshorts: [
-          {name:'Blue Swimming Shorts', price:15, image:'https://upload.wikimedia.org/wikipedia/commons/6/69/Blue_swimming_shorts.jpg', description:'Swimming shorts for summer.'},
-          {name:'Red Swimming Shorts', price:15, image:'https://upload.wikimedia.org/wikipedia/commons/a/a4/Red_swimming_shorts.jpg', description:'Swimming shorts for summer.'},
-        ]
-      }
+        swimmingShorts: [
+          { id: 'clsw1', name: 'Blue Swim Shorts', price: 19.99, image: 'https://i.imgur.com/qMeKdKJ.png' },
+          { id: 'clsw2', name: 'Black Swim Shorts', price: 21.99, image: 'https://i.imgur.com/qMeKdKJ.png' },
+        ],
+      },
     },
-    virtual: {
-      fortnite: [
-        {name:'Fortnite Account - Level 100', price:50, image:'https://upload.wikimedia.org/wikipedia/en/4/48/Fortnite_Battle_Royale_Season_3_Logo.png', description:'Level 100 Fortnite account.'},
-        {name:'V-Bucks 1000', price:10, image:'https://upload.wikimedia.org/wikipedia/en/4/48/Fortnite_Battle_Royale_Season_3_Logo.png', description:'1000 V-Bucks.'}
-      ],
-      roblox: [
-        {name:'Roblox Premium 1 Month', price:10, image:'https://upload.wikimedia.org/wikipedia/commons/4/4c/Roblox_Logo_2015.svg', description:'Roblox premium membership.'}
-      ]
+  };
+
+  // Helpers to flatten product list for search & display
+  function getAllProducts() {
+    let list = [];
+    for (const cat in productsData) {
+      const catData = productsData[cat];
+      for (const subcat in catData) {
+        if (Array.isArray(catData[subcat])) {
+          list = list.concat(catData[subcat].map(p => ({ ...p, category: cat, subcategory: subcat })));
+        } else {
+          // Nested further
+          for (const subsubcat in catData[subcat]) {
+            list = list.concat(catData[subcat][subsubcat].map(p => ({ ...p, category: cat, subcategory: subcat, subsubcategory: subsubcat })));
+          }
+        }
+      }
     }
-  };
-
-  // Flags for countries (simple, from Wikipedia commons)
-  const countryFlags = {
-    Spain: 'https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg',
-    England: 'https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg',
-    Italy: 'https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg',
-    Germany: 'https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg',
-    Turkey: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg'
-  };
-
-  // Teams by countries for football sets
-  const footballTeamsByCountry = {
-    Spain: ['FC Barcelona', 'Real Madrid'],
-    England: ['Manchester United', 'Liverpool'],
-    Italy: ['Juventus'],
-    Germany: ['Bayern Munich'],
-    Turkey: ['Galatasaray', 'Fenerbahçe', 'Beşiktaş']
-  };
-
-  // Current state
-  let currentCategory = null; // virtual, physical
-  let currentPhysicalSub = null; // football, clothing
-  let currentFootballSub = null; // jerseys, shorts, sets
-  let currentFootballCountry = null; // Spain, England, etc.
-  let cart = {};
-
-  // Elements
-  const menuBtn = document.getElementById('menuBtn');
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('main');
-  const productsDiv = document.getElementById('products');
-  const flagBg = document.getElementById('flag-bg');
-  const cartDiv = document.getElementById('cart');
-  const cartItemsDiv = document.getElementById('cart-items');
-  const cartTotalDiv = document.getElementById('cart-total');
-  const cartCloseBtn = document.getElementById('cart-close');
-
-  const virtualBtn = document.getElementById('virtualBtn');
-  const physicalBtn = document.getElementById('physicalBtn');
-  const virtualSub = document.getElementById('virtualSub');
-  const physicalSub = document.getElementById('physicalSub');
-
-  const footballBtn = document.getElementById('footballBtn');
-  const clothingBtn = document.getElementById('clothingBtn');
-  const footballSub = document.getElementById('footballSub');
-  const clothingSub = document.getElementById('clothingSub');
-
-  const productSearch = document.getElementById('productSearch');
-  const priceMin = document.getElementById('priceMin');
-  const priceMax = document.getElementById('priceMax');
-  const clearFiltersBtn = document.getElementById('clearFilters');
-  const searchBar = document.getElementById('searchBar');
-
-  // --- Helpers ---
-  function clearProducts() {
-    productsDiv.innerHTML = '';
+    return list;
   }
 
-  function addToCart(product) {
-    if(cart[product.name]) {
-      cart[product.name].qty++;
-    } else {
-      cart[product.name] = {...product, qty:1};
+  let displayedProducts = [];
+
+  function renderProducts(products) {
+    productsGrid.innerHTML = '';
+    if (products.length === 0) {
+      productsGrid.innerHTML = '<p>No products found.</p>';
+      return;
     }
-    updateCart();
-    openCart();
+    products.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" />
+        <h3>${p.name}</h3>
+        <p>$${p.price.toFixed(2)}</p>
+        <button class="add-to-cart" data-id="${p.id}">Add to Cart</button>
+      `;
+      productsGrid.appendChild(card);
+    });
   }
 
-  function updateCart() {
-    cartItemsDiv.innerHTML = '';
+  function filterProducts() {
+    const term = searchInput.value.trim().toLowerCase();
+    const min = parseFloat(minPrice.value) || 0;
+    const max = parseFloat(maxPrice.value) || Infinity;
+    let filtered = displayedProducts.filter(p => p.name.toLowerCase().includes(term) && p.price >= min && p.price <= max);
+    renderProducts(filtered);
+  }
+
+  function openMenu() {
+    sideMenu.classList.add('open');
+    mainContent.classList.add('menu-open');
+    menuBtn.style.display = 'none';
+  }
+  function closeMenu() {
+    sideMenu.classList.remove('open');
+    mainContent.classList.remove('menu-open');
+    menuBtn.style.display = 'block';
+    subMenu.innerHTML = '';
+    currentSubCategory = null;
+  }
+
+  function loadSubMenu(category) {
+    currentCategory = category;
+    subMenu.innerHTML = '';
+    if (category === 'virtual') {
+      const options = Object.keys(productsData.virtual);
+      const container = document.createElement('div');
+      container.innerHTML = '<h3>Virtual Options</h3>';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => {
+          currentSubCategory = opt;
+          displayedProducts = productsData.virtual[opt];
+          filterProducts();
+          closeMenu();
+        };
+        container.appendChild(btn);
+      });
+      subMenu.appendChild(container);
+    } else if (category === 'physical') {
+      // Physical sub menu
+      const options = Object.keys(productsData.physical);
+      const container = document.createElement('div');
+      container.innerHTML = '<h3>Physical Options</h3>';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+        btn.onclick = () => loadPhysicalSubMenu(opt);
+        container.appendChild(btn);
+      });
+      subMenu.appendChild(container);
+    }
+  }
+
+  function loadPhysicalSubMenu(subcat) {
+    currentSubCategory = subcat;
+    subMenu.innerHTML = `<h3>${subcat.charAt(0).toUpperCase() + subcat.slice(1)}</h3><button onclick="loadSubMenu('physical')">Back</button>`;
+    const options = Object.keys(productsData.physical[subcat]);
+    const container = document.createElement('div');
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+      btn.onclick = () => {
+        displayedProducts = productsData.physical[subcat][opt];
+        filterProducts();
+        closeMenu();
+      };
+      container.appendChild(btn);
+    });
+    subMenu.appendChild(container);
+  }
+
+  menuBtn.onclick = openMenu;
+  menuCloseBtn.onclick = closeMenu;
+
+  // Category buttons
+  sideMenu.querySelectorAll('nav button').forEach(btn => {
+    btn.onclick = () => loadSubMenu(btn.dataset.cat);
+  });
+
+  // Close menu clicking outside
+  mainContent.onclick = () => {
+    if (sideMenu.classList.contains('open')) closeMenu();
+  };
+
+  // Search/filter events
+  searchInput.oninput = filterProducts;
+  minPrice.oninput = filterProducts;
+  maxPrice.oninput = filterProducts;
+  clearFiltersBtn.onclick = () => {
+    searchInput.value = '';
+    minPrice.value = '';
+    maxPrice.value = '';
+    filterProducts();
+  };
+
+  // Cart functions
+  function saveCart() {
+    localStorage.setItem('shopCart', JSON.stringify(cartData));
+  }
+  function loadCart() {
+    const stored = localStorage.getItem('shopCart');
+    cartData = stored ? JSON.parse(stored) : {};
+  }
+  function updateCartUI() {
+    cartItems.innerHTML = '';
     let total = 0;
-    for(const key in cart) {
-      const item = cart[key];
-      total += item.price * item.qty;
+    for (const id in cartData) {
+      const p = getAllProducts().find(x => x.id === id);
+      if (!p) continue;
+      const qty = cartData[id];
+      total += p.price * qty;
       const itemDiv = document.createElement('div');
       itemDiv.className = 'cart-item';
       itemDiv.innerHTML = `
-        <img src="${item.image}" alt="${item.name}" />
-        <div class="cart-item-info">
-          <h5>${item.name}</h5>
-          <p>$${item.price.toFixed(2)} x </p>
-          <div class="cart-qty">
-            <button aria-label="Decrease quantity" data-name="${item.name}" class="qty-decrease">-</button>
-            <input type="number" min="1" value="${item.qty}" data-name="${item.name}" class="qty-input" />
-            <button aria-label="Increase quantity" data-name="${item.name}" class="qty-increase">+</button>
+        <img src="${p.image}" alt="${p.name}" />
+        <div class="cart-item-details">
+          <h4>${p.name}</h4>
+          <div class="qty-controls">
+            <button class="qty-minus" data-id="${id}">−</button>
+            <input type="number" min="1" max="100" value="${qty}" data-id="${id}" />
+            <button class="qty-plus" data-id="${id}">+</button>
           </div>
+          <p>$${(p.price * qty).toFixed(2)}</p>
         </div>
       `;
-      cartItemsDiv.appendChild(itemDiv);
+      cartItems.appendChild(itemDiv);
     }
-    cartTotalDiv.textContent = `Total: $${total.toFixed(2)}`;
+    cartTotal.textContent = `Total: $${total.toFixed(2)}`;
   }
 
-  function openCart() {
-    cartDiv.classList.add('open');
-  }
-  function closeCart() {
-    cartDiv.classList.remove('open');
-  }
-
-  // --- Render Products ---
-  function renderProducts(products) {
-    clearProducts();
-    if(products.length === 0) {
-      productsDiv.textContent = 'No products found.';
-      return;
+  productsGrid.onclick = e => {
+    if (e.target.classList.contains('add-to-cart')) {
+      const id = e.target.dataset.id;
+      cartData[id] = (cartData[id] || 0) + 1;
+      saveCart();
+      updateCartUI();
+      cart.classList.add('open');
     }
-    products.forEach(product => {
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      card.tabIndex = 0;
-      card.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" />
-        <h4>${product.name}</h4>
-        <p class="desc">${product.description}</p>
-        <p class="price">$${product.price.toFixed(2)}</p>
-        <button aria-label="Add ${product.name} to cart">Add to Cart</button>
-      `;
-      card.querySelector('button').addEventListener('click', () => {
-        addToCart(product);
-      });
-      productsDiv.appendChild(card);
-    });
-  }
+  };
 
-  // --- Load Football Country Sets ---
-  function loadFootballCountrySets(category) {
-    // Clear any previous footballSub content
-    footballSub.style.display = 'block';
-    clothingSub.style.display = 'none';
-
-    currentFootballSub = category;
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    searchBar.style.display = 'flex';
-
-    // Build country sets dynamically
-    const countriesContainer = document.getElementById('footballCountries');
-    countriesContainer.innerHTML = ''; // clear
-
-    // For each country with teams, show its sets filtered by category (jersey/shorts/sets)
-    for(const country in footballTeamsByCountry) {
-      const teams = footballTeamsByCountry[country];
-      const countryDiv = document.createElement('div');
-      countryDiv.id = `country-${country}`;
-      countryDiv.style.marginBottom = '30px';
-
-      const title = document.createElement('h3');
-      title.textContent = country;
-      countryDiv.appendChild(title);
-
-      // Filter football products for those teams and the selected category
-      const filteredProducts = productsData.physical.football[category].filter(prod => {
-        // Check if prod name contains any team from country
-        return teams.some(team => prod.name.toLowerCase().includes(team.toLowerCase()));
-      });
-
-      if(filteredProducts.length === 0) {
-        const noProd = document.createElement('p');
-        noProd.textContent = `No ${category} found for ${country}`;
-        countryDiv.appendChild(noProd);
-      } else {
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(auto-fit,minmax(180px,1fr))';
-        grid.style.gap = '15px';
-
-        filteredProducts.forEach(prod => {
-          const card = document.createElement('div');
-          card.className = 'product-card';
-          card.tabIndex = 0;
-          card.innerHTML = `
-            <img src="${prod.image}" alt="${prod.name}" />
-            <h4>${prod.name}</h4>
-            <p class="desc">${prod.description}</p>
-            <p class="price">$${prod.price.toFixed(2)}</p>
-            <button aria-label="Add ${prod.name} to cart">Add to Cart</button>
-          `;
-          card.querySelector('button').addEventListener('click', () => addToCart(prod));
-          grid.appendChild(card);
-        });
-        countryDiv.appendChild(grid);
-      }
-
-      countriesContainer.appendChild(countryDiv);
+  cartItems.onclick = e => {
+    const id = e.target.dataset.id;
+    if (!id) return;
+    if (e.target.classList.contains('qty-plus')) {
+      cartData[id] = Math.min((cartData[id] || 0) + 1, 100);
+      saveCart();
+      updateCartUI();
+    } else if (e.target.classList.contains('qty-minus')) {
+      cartData[id] = Math.max((cartData[id] || 1) - 1, 1);
+      saveCart();
+      updateCartUI();
     }
-  }
+  };
 
-  // --- Load Clothing Category ---
-  function loadClothingCategory(category) {
-    footballSub.style.display = 'none';
-    clothingSub.style.display = 'block';
-
-    currentFootballSub = null;
-    currentFootballCountry = null;
-
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    searchBar.style.display = 'flex';
-
-    const products = productsData.physical.clothing[category];
-    renderProducts(products);
-  }
-
-  // --- Load Virtual Products ---
-  function loadVirtualCategory(category) {
-    footballSub.style.display = 'none';
-    clothingSub.style.display = 'none';
-
-    currentFootballSub = null;
-    currentFootballCountry = null;
-
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    searchBar.style.display = 'flex';
-
-    const products = productsData.virtual[category];
-    renderProducts(products);
-  }
-
-  // --- Search & Filter ---
-  function filterProducts(products) {
-    const searchText = productSearch.value.trim().toLowerCase();
-    const minPrice = priceMin.value ? parseFloat(priceMin.value) : null;
-    const maxPrice = priceMax.value ? parseFloat(priceMax.value) : null;
-
-    return products.filter(prod => {
-      const matchesName = prod.name.toLowerCase().includes(searchText);
-      const matchesMin = minPrice === null || prod.price >= minPrice;
-      const matchesMax = maxPrice === null || prod.price <= maxPrice;
-      return matchesName && matchesMin && matchesMax;
-    });
-  }
-
-  function applyFilters() {
-    if(currentCategory === 'virtual') {
-      // Virtual categories
-      if(currentPhysicalSub) {
-        const filtered = filterProducts(productsData.virtual[currentPhysicalSub]);
-        renderProducts(filtered);
-      }
-    } else if(currentCategory === 'physical') {
-      if(currentPhysicalSub === 'football') {
-        if(currentFootballSub) {
-          // Filter football products by category (jerseys, shorts, sets)
-          // Show filtered results grouped by country
-          const countriesContainer = document.getElementById('footballCountries');
-          countriesContainer.innerHTML = '';
-
-          const countries = Object.keys(footballTeamsByCountry);
-          countries.forEach(country => {
-            const teams = footballTeamsByCountry[country];
-            const filteredProducts = productsData.physical.football[currentFootballSub].filter(prod => {
-              const matchesName = prod.name.toLowerCase().includes(productSearch.value.trim().toLowerCase());
-              const price = prod.price;
-              const matchesMin = priceMin.value ? price >= parseFloat(priceMin.value) : true;
-              const matchesMax = priceMax.value ? price <= parseFloat(priceMax.value) : true;
-              const isInCountry = teams.some(team => prod.name.toLowerCase().includes(team.toLowerCase()));
-              return matchesName && matchesMin && matchesMax && isInCountry;
-            });
-
-            const countryDiv = document.createElement('div');
-            countryDiv.style.marginBottom = '30px';
-
-            const title = document.createElement('h3');
-            title.textContent = country;
-            countryDiv.appendChild(title);
-
-            if(filteredProducts.length === 0) {
-              const noProd = document.createElement('p');
-              noProd.textContent = `No ${currentFootballSub} found for ${country} with given filters.`;
-              countryDiv.appendChild(noProd);
-            } else {
-              const grid = document.createElement('div');
-              grid.style.display = 'grid';
-              grid.style.gridTemplateColumns = 'repeat(auto-fit,minmax(180px,1fr))';
-              grid.style.gap = '15px';
-
-              filteredProducts.forEach(prod => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.tabIndex = 0;
-                card.innerHTML = `
-                  <img src="${prod.image}" alt="${prod.name}" />
-                  <h4>${prod.name}</h4>
-                  <p class="desc">${prod.description}</p>
-                  <p class="price">$${prod.price.toFixed(2)}</p>
-                  <button aria-label="Add ${prod.name} to cart">Add to Cart</button>
-                `;
-                card.querySelector('button').addEventListener('click', () => addToCart(prod));
-                grid.appendChild(card);
-              });
-              countryDiv.appendChild(grid);
-            }
-
-            countriesContainer.appendChild(countryDiv);
-          });
-        }
-      } else if(currentPhysicalSub === 'clothing') {
-        const filtered = filterProducts(productsData.physical.clothing[currentFootballSub]);
-        renderProducts(filtered);
-      }
-    }
-  }
-
-  // --- Event Listeners ---
-
-  virtualBtn.addEventListener('click', () => {
-    currentCategory = 'virtual';
-    currentPhysicalSub = null;
-    virtualSub.style.display = 'block';
-    physicalSub.style.display = 'none';
-    footballSub.style.display = 'none';
-    clothingSub.style.display = 'none';
-    searchBar.style.display = 'flex';
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    renderProducts([]);
-  });
-
-  physicalBtn.addEventListener('click', () => {
-    currentCategory = 'physical';
-    currentPhysicalSub = null;
-    virtualSub.style.display = 'none';
-    physicalSub.style.display = 'block';
-    footballSub.style.display = 'none';
-    clothingSub.style.display = 'none';
-    searchBar.style.display = 'none';
-    clearProducts();
-  });
-
-  footballBtn.addEventListener('click', () => {
-    currentPhysicalSub = 'football';
-    footballSub.style.display = 'block';
-    clothingSub.style.display = 'none';
-    searchBar.style.display = 'flex';
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    loadFootballCountrySets('jerseys');
-  });
-
-  clothingBtn.addEventListener('click', () => {
-    currentPhysicalSub = 'clothing';
-    footballSub.style.display = 'none';
-    clothingSub.style.display = 'block';
-    searchBar.style.display = 'flex';
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    loadClothingCategory('socks');
-  });
-
-  // Football category buttons
-  document.querySelectorAll('.football-category').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const cat = e.target.dataset.cat;
-      loadFootballCountrySets(cat);
-    });
-  });
-
-  // Clothing category buttons
-  document.querySelectorAll('.clothing-category').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const cat = e.target.dataset.cat;
-      loadClothingCategory(cat);
-      currentFootballSub = cat;
-    });
-  });
-
-  // Virtual subcategory buttons
-  document.querySelectorAll('#virtualSub button').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const cat = e.target.id.replace('Btn', '').toLowerCase();
-      currentPhysicalSub = cat;
-      loadVirtualCategory(cat);
-    });
-  });
-
-  // Search and filter
-  productSearch.addEventListener('input', applyFilters);
-  priceMin.addEventListener('input', applyFilters);
-  priceMax.addEventListener('input', applyFilters);
-  clearFiltersBtn.addEventListener('click', () => {
-    productSearch.value = '';
-    priceMin.value = '';
-    priceMax.value = '';
-    applyFilters();
-  });
-
-  // Cart quantity buttons and input
-  cartItemsDiv.addEventListener('click', (e) => {
-    if(e.target.classList.contains('qty-increase')) {
-      const name = e.target.dataset.name;
-      cart[name].qty++;
-      updateCart();
-    } else if(e.target.classList.contains('qty-decrease')) {
-      const name = e.target.dataset.name;
-      if(cart[name].qty > 1) {
-        cart[name].qty--;
-        updateCart();
-      }
-    }
-  });
-
-  cartItemsDiv.addEventListener('input', (e) => {
-    if(e.target.classList.contains('qty-input')) {
-      const name = e.target.dataset.name;
+  cartItems.onchange = e => {
+    if (e.target.tagName === 'INPUT' && e.target.dataset.id) {
       let val = parseInt(e.target.value);
-      if(isNaN(val) || val < 1) {
-        val = 1;
-      }
-      cart[name].qty = val;
-      updateCart();
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 100) val = 100;
+      cartData[e.target.dataset.id] = val;
+      saveCart();
+      updateCartUI();
     }
-  });
+  };
 
-  cartCloseBtn.addEventListener('click', closeCart);
+  closeCartBtn.onclick = () => {
+    cart.classList.remove('open');
+  };
 
-  // Initialize
-  virtualBtn.click();
+  // Initial load
+  displayedProducts = getAllProducts();
+  renderProducts(displayedProducts);
+  loadCart();
+  updateCartUI();
 </script>
-
 </body>
 </html>
