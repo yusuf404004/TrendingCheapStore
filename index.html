@@ -5,898 +5,825 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TrendingCheapStore</title>
 <style>
-  /* Reset & basics */
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
   body, html {
-    margin:0; padding:0; height:100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #121212; color:#eee;
+    margin:0; padding:0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
     overflow-x: hidden;
   }
   button {
-    cursor:pointer;
-    background:#222;
-    color:#eee;
-    border:none;
-    padding:6px 12px;
-    border-radius:4px;
-    transition: background 0.3s ease;
-  }
-  button:hover, button:focus {
-    background:#3a3a3a;
-    outline:none;
-  }
-  h2 {
-    margin-top:0; margin-bottom:10px;
+    cursor: pointer;
   }
 
   /* Layout */
-  #page {
-    display:flex;
-    min-height:100vh;
+  #app {
+    display: flex;
+    min-height: 100vh;
   }
+
   /* Sidebar */
   #sidebar {
-    background:#1f1f1f;
-    width:320px;
-    max-width:90vw;
-    padding:20px;
-    box-sizing: border-box;
     position: fixed;
-    top:0; left:0; bottom:0;
-    transform: translateX(-100%);
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #222d42;
+    color: white;
+    padding: 1rem 0;
+    transform: translateX(-280px);
     transition: transform 0.3s ease;
     overflow-y: auto;
     z-index: 1100;
-    border-right: 1px solid #333;
   }
   #sidebar.open {
     transform: translateX(0);
   }
+  #sidebar h2 {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0 1.5rem 1rem;
+    user-select: none;
+  }
+  #sidebar section {
+    margin-bottom: 1rem;
+  }
+  #sidebar button.category-btn,
+  #sidebar button.subcat-btn,
+  #sidebar button.subsubcat-btn {
+    display: block;
+    width: 90%;
+    margin: 0.3rem auto;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    color: #cfd8dc;
+    font-size: 0.9rem;
+    text-align: left;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  #sidebar button.category-btn:hover,
+  #sidebar button.subcat-btn:hover,
+  #sidebar button.subsubcat-btn:hover {
+    background-color: #455a75;
+    color: white;
+  }
+  #sidebar button.active {
+    background-color: #1a73e8;
+    color: white;
+    font-weight: 700;
+  }
 
-  /* Sidebar toggle button top-left */
+  /* Sidebar toggle button top left */
   #sidebarToggle {
     position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1200;
-    background: #ff5722;
-    border-radius: 50%;
-    width: 40px; height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 10px; left: 10px;
+    width: 35px; height: 35px;
+    background: #1a73e8;
+    border: none;
+    border-radius: 5px;
+    color: white;
     font-weight: 700;
     font-size: 22px;
-    color: white;
-    box-shadow: 0 0 10px rgba(255,87,34,0.7);
+    z-index: 1200;
+    user-select: none;
   }
 
-  /* Hide Cart button when sidebar open */
+  /* Main Content */
+  #mainContent {
+    margin-left: 0;
+    padding: 1rem 1rem 3rem 1rem;
+    flex: 1;
+    transition: margin-left 0.3s ease;
+  }
+  #sidebar.open ~ #mainContent {
+    margin-left: 260px;
+  }
+
+  /* Header with Cart button */
+  #header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
   #cartToggle {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 1200;
-    background: #2196f3;
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-weight: 700;
-    font-size: 14px;
+    background: #1a73e8;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
     color: white;
-    box-shadow: 0 0 10px rgba(33,150,243,0.7);
-    transition: opacity 0.3s ease;
+    font-weight: 700;
+    user-select: none;
+    transition: background-color 0.3s ease;
   }
   #cartToggle.hidden {
-    opacity: 0; pointer-events: none;
+    display: none;
   }
-
-  /* Filters container */
-  #filters {
-    margin-bottom: 20px;
-  }
-  #filters label {
-    display:block;
-    margin-bottom:6px;
-    color:#bbb;
-    font-weight: 600;
-  }
-  #filters input[type="text"], #filters select {
-    width: 100%;
-    padding:8px 10px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: none;
-    margin-bottom: 12px;
-    background: #2a2a2a;
-    color: #eee;
-  }
-  #filters input[type="text"]::placeholder {
-    color: #888;
-  }
-
-  /* Category buttons */
-  .category-btn {
-    width: 100%;
-    background: #333;
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 18px;
-    font-weight: 700;
-    border-radius: 6px;
-    text-align: left;
-  }
-  .category-btn.active {
-    background: #ff5722;
-    color: white;
-  }
-
-  /* Subcategory buttons container */
-  .subcat-container {
-    margin-left: 12px;
-    margin-bottom: 15px;
-  }
-  .subcat-btn {
-    display: block;
-    width: 100%;
-    background: #444;
-    margin: 6px 0;
-    padding: 8px 12px;
-    font-size: 16px;
-    border-radius: 5px;
-    text-align: left;
-  }
-  .subcat-btn.active {
-    background: #ff7043;
-    color: white;
-  }
-
-  /* Subsubcategory buttons for football sets, jerseys etc */
-  .subsubcat-container {
-    margin-left: 24px;
-    margin-bottom: 15px;
-  }
-  .subsubcat-btn {
-    display: inline-block;
-    background: #555;
-    margin: 4px 6px 6px 0;
-    padding: 6px 10px;
-    font-size: 14px;
-    border-radius: 4px;
-  }
-  .subsubcat-btn.active {
-    background: #ff8a65;
-    color: white;
+  #cartToggle:hover {
+    background: #155ab6;
   }
 
   /* Products grid */
   #products {
-    flex-grow: 1;
-    margin-left: 0;
-    padding: 80px 40px 40px 40px;
-    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 24px;
-    max-width: calc(100vw - 320px);
-    margin-left: 320px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
-
-  /* Product item */
   .product-item {
-    background: #222;
-    border-radius: 10px;
-    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    padding: 0.8rem;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
     display: flex;
+    flex-direction: column;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(255, 87, 34, 0.2);
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.25s ease;
   }
-  .product-item:hover, .product-item:focus {
-    box-shadow: 0 0 15px rgba(255, 87, 34, 0.6);
-    outline: none;
+  .product-item:hover {
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.15);
   }
   .product-item img {
-    width: 48px;
-    height: 48px;
+    max-width: 100%;
+    height: 140px;
     object-fit: contain;
-    border-radius: 6px;
-    margin-right: 14px;
-    user-select: none;
   }
   .product-name {
-    flex-grow: 1;
-    font-weight: 700;
-    font-size: 16px;
-    user-select: none;
+    margin-top: 0.6rem;
+    font-weight: 600;
+    text-align: center;
+    font-size: 1rem;
   }
   .price {
+    margin-top: 0.3rem;
+    color: #388e3c;
     font-weight: 700;
-    font-size: 14px;
-    color: #ff5722;
-    user-select: none;
+    font-size: 1.1rem;
   }
 
-  /* Cart overlay */
+  /* Cart Overlay */
   #cartOverlay {
     position: fixed;
     top: 60px;
-    right: 20px;
-    width: 320px;
-    max-width: 90vw;
-    height: calc(100vh - 80px);
-    background: #1a1a1a;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.8);
-    padding: 20px;
-    box-sizing: border-box;
+    right: 10px;
+    width: 350px;
+    max-height: 75vh;
+    background: white;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 0.25);
+    border-radius: 8px;
+    padding: 1rem;
     overflow-y: auto;
-    z-index: 1300;
+    z-index: 1200;
     display: none;
   }
-  #cartOverlay.open {
+  #cartOverlay.visible {
     display: block;
   }
-  #cartOverlay h2 {
+  #cartOverlay h3 {
     margin-top: 0;
-    margin-bottom: 20px;
-    color: #ff5722;
+    margin-bottom: 1rem;
+    text-align: center;
   }
   .cart-item {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 8px;
+    margin-bottom: 1rem;
+    gap: 0.7rem;
   }
   .cart-item img {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
-    margin-right: 10px;
-    user-select: none;
+    border-radius: 4px;
+    border: 1px solid #ddd;
   }
   .cart-item-info {
-    flex-grow: 1;
-    color: #ddd;
+    flex: 1;
   }
   .cart-item-name {
     font-weight: 600;
-    margin-bottom: 4px;
+    font-size: 0.95rem;
   }
   .cart-item-price {
-    color: #ff7043;
+    color: #388e3c;
     font-weight: 700;
+    font-size: 0.9rem;
   }
   .cart-quantity {
     display: flex;
     align-items: center;
+    gap: 0.3rem;
   }
   .qty-btn {
     width: 22px;
     height: 22px;
-    line-height: 20px;
-    border-radius: 4px;
-    background: #ff5722;
+    background: #1a73e8;
     border: none;
+    border-radius: 4px;
     color: white;
     font-weight: 700;
-    font-size: 16px;
-    margin: 0 4px;
-    cursor: pointer;
+    font-size: 18px;
+    line-height: 18px;
+    padding: 0;
+    user-select: none;
+  }
+  .qty-btn:active {
+    background: #155ab6;
   }
   .qty-input {
-    width: 40px;
+    width: 45px;
+    height: 28px;
     text-align: center;
-    font-size: 14px;
-    background: #222;
-    border: 1px solid #444;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    color: #eee;
+    font-size: 1rem;
   }
 
-  /* Checkout and code section */
-  #checkout {
-    margin-top: 20px;
+  /* Checkout & promo */
+  #checkoutTotal {
     font-weight: 700;
-    font-size: 18px;
-    color: #ff5722;
+    font-size: 1.15rem;
+    text-align: center;
+    margin-top: 1rem;
+    color: #111;
   }
   #promoSection {
-    margin-top: 16px;
+    margin-top: 1.2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    align-items: center;
   }
   #promoInput {
     width: 65%;
-    padding: 6px 8px;
-    font-size: 14px;
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #bbb;
     border-radius: 4px;
-    border: none;
-    background: #2a2a2a;
-    color: #eee;
-    margin-right: 8px;
   }
   #promoBtn {
-    padding: 7px 12px;
-    font-weight: 700;
-    background: #ff5722;
+    background: #388e3c;
     border: none;
-    border-radius: 4px;
     color: white;
+    font-weight: 700;
+    padding: 0.4rem 0.9rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    user-select: none;
+  }
+  #promoBtn:hover {
+    background: #2c6e2a;
   }
   #promoMsg {
-    margin-top: 10px;
+    text-align: center;
+    margin-top: 0.7rem;
     font-weight: 600;
+  }
+
+  /* Search & filters */
+  #filters {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #searchInput {
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem;
+    width: 200px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  #priceFilter {
+    width: 150px;
+  }
+  label {
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    #products {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #sidebar.open ~ #mainContent {
+      margin-left: 260px;
+    }
+  }
+  @media (max-width: 600px) {
+    #products {
+      grid-template-columns: 1fr;
+    }
+    #sidebar {
+      width: 220px;
+    }
+    #sidebar.open ~ #mainContent {
+      margin-left: 220px;
+    }
   }
 </style>
 </head>
 <body>
-  <!-- Sidebar Toggle -->
-  <button id="sidebarToggle" aria-label="Toggle Menu">&#9776;</button>
-  <!-- Cart Toggle -->
-  <button id="cartToggle" aria-label="Toggle Cart">Cart (0)</button>
+<button id="sidebarToggle" aria-label="Toggle menu">&#9776;</button>
 
-  <div id="page">
-    <!-- Sidebar -->
-    <nav id="sidebar" aria-label="Shop Menu" role="navigation" tabindex="0">
-      <div id="filters" aria-label="Filters and Search">
-        <label for="searchInput">Search Products</label>
-        <input type="text" id="searchInput" placeholder="Search..." aria-describedby="searchHelp" />
+<div id="sidebar" aria-label="Sidebar navigation menu" role="navigation" aria-hidden="true">
+  <h2>Categories</h2>
+  <section>
+    <button class="category-btn" id="catVirtual" aria-pressed="false">Virtual</button>
+    <div id="virtualSubcats" style="display:none; padding-left: 1rem;">
+      <button class="subcat-btn" data-subcat="fortniteAccounts">Fortnite Accounts</button>
+      <button class="subcat-btn" data-subcat="vBucks">V-Bucks</button>
+    </div>
+  </section>
+  <section>
+    <button class="category-btn" id="catPhysical" aria-pressed="false">Physical</button>
+    <div id="physicalSubcats" style="display:none; padding-left: 1rem;">
+      <button class="subcat-btn" data-subcat="football">Football</button>
+      <button class="subcat-btn" data-subcat="clothing">Clothing</button>
+    </div>
+    <div id="footballSubsubcats" style="display:none; padding-left: 1.5rem; margin-top: 0.5rem;">
+      <button class="subsubcat-btn" data-subsubcat="jerseys">Jerseys</button>
+      <button class="subsubcat-btn" data-subsubcat="mysteryBoxes">Mystery Boxes</button>
+      <button class="subsubcat-btn" data-subsubcat="sets">Sets</button>
+    </div>
+    <div id="clothingSubsubcats" style="display:none; padding-left: 1.5rem; margin-top: 0.5rem;">
+      <button class="subsubcat-btn" data-subsubcat="socks">Socks</button>
+      <button class="subsubcat-btn" data-subsubcat="shirts">Shirts</button>
+      <button class="subsubcat-btn" data-subsubcat="tshirts">T-Shirts</button>
+      <button class="subsubcat-btn" data-subsubcat="pants">Pants</button>
+      <button class="subsubcat-btn" data-subsubcat="shorts">Shorts</button>
+      <button class="subsubcat-btn" data-subsubcat="swimShorts">Swimming Shorts</button>
+    </div>
+  </section>
+</div>
 
-        <label for="priceFilter">Max Price ($)</label>
-        <select id="priceFilter" aria-describedby="priceHelp">
-          <option value="1000" selected>Any</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="75">75</option>
-          <option value="100">100</option>
-          <option value="150">150</option>
-          <option value="250">250</option>
-          <option value="500">500</option>
-        </select>
-      </div>
+<div id="app">
+  <main id="mainContent" tabindex="-1" aria-label="Main store content">
+    <header id="header">
+      <button id="cartToggle" aria-label="Toggle shopping cart">Cart 🛒</button>
+    </header>
 
-      <!-- Categories -->
-      <button class="category-btn" id="catVirtual">Virtual</button>
-      <div class="subcat-container" id="virtualSubcats" style="display:none;">
-        <button class="subcat-btn" data-subcat="fortnite">Fortnite Accounts</button>
-        <button class="subcat-btn" data-subcat="vbucks">V-Bucks</button>
-      </div>
+    <div id="filters" aria-label="Product search and price filter">
+      <input type="search" id="searchInput" placeholder="Search products..." aria-label="Search products" />
+      <select id="priceFilter" aria-label="Filter by price">
+        <option value="all">All Prices</option>
+        <option value="0-20">Under $20</option>
+        <option value="20-50">$20 - $50</option>
+        <option value="50-100">$50 - $100</option>
+        <option value="100+">Over $100</option>
+      </select>
+    </div>
 
-      <button class="category-btn" id="catPhysical">Physical</button>
-      <div class="subcat-container" id="physicalSubcats" style="display:none;">
-        <button class="subcat-btn" data-subcat="football">Football</button>
-        <button class="subcat-btn" data-subcat="clothing">Clothing</button>
-      </div>
+    <section id="products" aria-live="polite" aria-label="Product listings">
+      <!-- Products go here -->
+    </section>
+  </main>
+</div>
 
-      <!-- Football Sub-subcategories -->
-      <div class="subsubcat-container" id="footballSubsubcats" style="display:none;">
-        <button class="subsubcat-btn" data-subsubcat="jerseys">Jerseys</button>
-        <button class="subsubcat-btn" data-subsubcat="mysteryboxes">Mystery Boxes</button>
-        <button class="subsubcat-btn" data-subsubcat="sets">Sets</button>
-      </div>
-
-      <!-- Clothing Sub-subcategories -->
-      <div class="subsubcat-container" id="clothingSubsubcats" style="display:none;">
-        <button class="subsubcat-btn" data-subsubcat="socks">Socks</button>
-        <button class="subsubcat-btn" data-subsubcat="shirts">Shirts</button>
-        <button class="subsubcat-btn" data-subsubcat="tshirts">T-Shirts</button>
-        <button class="subsubcat-btn" data-subsubcat="pants">Pants</button>
-        <button class="subsubcat-btn" data-subsubcat="shorts">Shorts</button>
-        <button class="subsubcat-btn" data-subsubcat="swimshorts">Swimming Shorts</button>
-      </div>
-    </nav>
-
-    <!-- Products Grid -->
-    <main id="products" role="main" aria-live="polite" aria-label="Products List">
-      <!-- Products will render here -->
-    </main>
-
-    <!-- Cart -->
-    <aside id="cartOverlay" aria-label="Shopping Cart" role="region" aria-live="polite">
-      <h2>Shopping Cart</h2>
-      <div id="cartItems"></div>
-      <div id="checkout">Total: $0.00</div>
-      <div id="promoSection" aria-label="Promo Code Section">
-        <input type="text" id="promoInput" placeholder="Enter discount code" aria-label="Promo Code Input" />
-        <button id="promoBtn" aria-label="Apply Promo Code">Apply</button>
-        <div id="promoMsg" role="alert"></div>
-      </div>
-    </aside>
+<!-- Cart overlay -->
+<aside id="cartOverlay" aria-label="Shopping cart" role="dialog" aria-modal="true" aria-hidden="true">
+  <h3>Your Cart</h3>
+  <div id="cartItems" role="list"></div>
+  <div id="checkoutTotal" aria-live="polite">Total: $0.00</div>
+  <div id="promoSection">
+    <input type="text" id="promoInput" placeholder="Promo code" aria-label="Enter promo code" />
+    <button id="promoBtn" aria-label="Apply promo code">Apply</button>
   </div>
+  <div id="promoMsg" role="alert" aria-live="assertive"></div>
+</aside>
 
 <script>
-  // Product Data
-  const allProducts = {
+  // Data: Products by category/subcategory/subsubcategory
+  const productsData = {
     virtual: {
-      fortnite: [
-        {id:1, name:"FN Account Alpha", price:15, img:"https://i.imgur.com/7bI1aJ9.png"},
-        {id:2, name:"FN Account Bravo", price:25, img:"https://i.imgur.com/5X3HwZm.png"},
-        {id:3, name:"FN Account Charlie", price:50, img:"https://i.imgur.com/1UR2rGL.png"},
-        {id:4, name:"FN Account Delta", price:75, img:"https://i.imgur.com/kqwWavV.png"},
-        {id:5, name:"FN Account Echo", price:10, img:"https://i.imgur.com/wnEm71v.png"},
+      fortniteAccounts: [
+        { id: 'v1', name: 'FN Account Level 50', price: 45, image: 'https://cdn2.unrealengine.com/fortnite-fnf-fnf2-1920x1080-72e49d1c98c7.jpg' },
+        { id: 'v2', name: 'FN Account Level 100', price: 80, image: 'https://cdn2.unrealengine.com/fortnite-fnf-hero-1920x1080-96276b70d381.jpg' }
       ],
-      vbucks: [
-        {id:1, name:"1000 V-Bucks", price:10, img:"https://i.imgur.com/0xnUJ9L.png"},
-        {id:2, name:"2500 V-Bucks", price:20, img:"https://i.imgur.com/Mv0YkP6.png"},
-        {id:3, name:"5000 V-Bucks", price:40, img:"https://i.imgur.com/ZaEfzZk.png"},
-        {id:4, name:"10000 V-Bucks", price:75, img:"https://i.imgur.com/k5VPRxI.png"},
+      vBucks: [
+        { id: 'v3', name: '1,000 V-Bucks', price: 10, image: 'https://fortnite-api.com/images/currency/v-bucks.png' },
+        { id: 'v4', name: '5,000 V-Bucks', price: 45, image: 'https://fortnite-api.com/images/currency/v-bucks.png' }
       ]
     },
     physical: {
       football: {
         jerseys: [
-          {id:1, name:"Galatasaray Jersey", price:90, img:"https://i.imgur.com/F5P3GzT.jpg"},
-          {id:2, name:"Fenerbahce Jersey", price:85, img:"https://i.imgur.com/WkwLVNe.jpg"},
-          {id:3, name:"Besiktas Jersey", price:80, img:"https://i.imgur.com/UVG3yZ5.jpg"},
-          {id:4, name:"Manchester United Jersey", price:110, img:"https://i.imgur.com/BFeF88O.jpg"},
-          {id:5, name:"FC Barcelona Jersey", price:120, img:"https://i.imgur.com/7qG2b1O.jpg"},
-          {id:6, name:"Real Madrid Jersey", price:130, img:"https://i.imgur.com/MCP3P7J.jpg"},
+          { id: 'f1', name: 'FC Barcelona Jersey', price: 65, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021-22%29.png' },
+          { id: 'f2', name: 'Real Madrid Jersey', price: 70, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+          { id: 'f3', name: 'Galatasaray Jersey', price: 55, image: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Galatasaray_S.K._logo.svg' }
         ],
-        mysteryboxes: [
-          {id:1, name:"Football Mystery Box A", price:30, img:"https://i.imgur.com/5GVKM0F.jpg"},
-          {id:2, name:"Football Mystery Box B", price:50, img:"https://i.imgur.com/TDnP9kH.jpg"},
+        mysteryBoxes: [
+          { id: 'f4', name: 'Football Mystery Box', price: 30, image: 'https://cdn-icons-png.flaticon.com/512/105/105218.png' }
         ],
         sets: [
-          {id:1, name:"Starter Football Set", price:150, img:"https://i.imgur.com/eo5xOWX.jpg"},
-          {id:2, name:"Pro Football Set", price:250, img:"https://i.imgur.com/kjYs7LB.jpg"},
-          {id:3, name:"Ultimate Football Set", price:400, img:"https://i.imgur.com/3EgplJj.jpg"},
+          { id: 'f5', name: 'Barcelona Set (Jersey + Socks)', price: 100, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021-22%29.png' },
+          { id: 'f6', name: 'Real Madrid Set (Jersey + Shorts)', price: 110, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' }
         ]
       },
       clothing: {
         socks: [
-          {id:1, name:"Comfy Socks", price:12, img:"https://i.imgur.com/XlP2AYH.jpg"},
-          {id:2, name:"Sport Socks", price:15, img:"https://i.imgur.com/6vP3JZV.jpg"},
+          { id: 'c1', name: 'Comfort Socks', price: 12, image: 'https://cdn-icons-png.flaticon.com/512/1995/1995521.png' }
         ],
         shirts: [
-          {id:1, name:"Casual Shirt", price:25, img:"https://i.imgur.com/lYnDqG5.jpg"},
-          {id:2, name:"Formal Shirt", price:45, img:"https://i.imgur.com/Tu5B20G.jpg"},
+          { id: 'c2', name: 'Casual Shirt', price: 25, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
         ],
         tshirts: [
-          {id:1, name:"Graphic T-Shirt", price:20, img:"https://i.imgur.com/Js5VVG8.jpg"},
-          {id:2, name:"Plain T-Shirt", price:15, img:"https://i.imgur.com/cYxD5KW.jpg"},
+          { id: 'c3', name: 'Graphic T-Shirt', price: 18, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
         ],
         pants: [
-          {id:1, name:"Jeans", price:40, img:"https://i.imgur.com/eoUXcVZ.jpg"},
-          {id:2, name:"Chinos", price:35, img:"https://i.imgur.com/mQz6x9H.jpg"},
+          { id: 'c4', name: 'Jeans', price: 40, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
         ],
         shorts: [
-          {id:1, name:"Summer Shorts", price:18, img:"https://i.imgur.com/BcpCYc9.jpg"},
-          {id:2, name:"Beach Shorts", price:22, img:"https://i.imgur.com/6vTz3eA.jpg"},
+          { id: 'c5', name: 'Casual Shorts', price: 22, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
         ],
-        swimshorts: [
-          {id:1, name:"Blue Swim Shorts", price:25, img:"https://i.imgur.com/Kb7GiQv.jpg"},
-          {id:2, name:"Red Swim Shorts", price:28, img:"https://i.imgur.com/nDf4yQ6.jpg"},
+        swimShorts: [
+          { id: 'c6', name: 'Swimming Shorts', price: 30, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
         ]
       }
     }
   };
 
-  // State
-  let currentCategory = null;  // 'virtual' or 'physical'
-  let currentSubcategory = null; // e.g. 'fortnite' or 'football' or 'clothing'
-  let currentSubSubcategory = null; // e.g. 'jerseys' or 'socks'
+  // State variables
+  let currentCategory = null;
+  let currentSubcategory = null;
+  let currentSubSubcategory = null;
   let cart = {};
-  let sidebarOpen = false;
   let discountApplied = false;
+  let usedPromo = false;
 
-  // Elements
+  // DOM elements
   const sidebar = document.getElementById('sidebar');
   const sidebarToggle = document.getElementById('sidebarToggle');
+  const mainContent = document.getElementById('mainContent');
   const cartToggle = document.getElementById('cartToggle');
-  const productsContainer = document.getElementById('products');
   const cartOverlay = document.getElementById('cartOverlay');
-  const cartItemsContainer = document.getElementById('cartItems');
-  const checkoutTotal = document.getElementById('checkout');
+  const cartItemsDiv = document.getElementById('cartItems');
+  const checkoutTotal = document.getElementById('checkoutTotal');
   const promoInput = document.getElementById('promoInput');
   const promoBtn = document.getElementById('promoBtn');
   const promoMsg = document.getElementById('promoMsg');
-
-  const catVirtualBtn = document.getElementById('catVirtual');
-  const catPhysicalBtn = document.getElementById('catPhysical');
-  const virtualSubcats = document.getElementById('virtualSubcats');
-  const physicalSubcats = document.getElementById('physicalSubcats');
-  const footballSubsubcats = document.getElementById('footballSubsubcats');
-  const clothingSubsubcats = document.getElementById('clothingSubsubcats');
-
   const searchInput = document.getElementById('searchInput');
   const priceFilter = document.getElementById('priceFilter');
 
-  // Helpers
-  function clearActiveButtons(container, selector) {
-    container.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
-  }
+  // Utility: Format price
   function formatPrice(num) {
-    return '$' + num.toFixed(2);
+    return `$${num.toFixed(2)}`;
   }
 
-  // Render products function
-  function renderProducts() {
-    productsContainer.innerHTML = '';
-    let productsToShow = [];
+  // Show/hide sidebar
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    sidebar.setAttribute('aria-hidden', sidebar.classList.contains('open') ? 'false' : 'true');
+  });
 
-    // Select products based on current filters
-    if (!currentCategory) return;
+  // Clicking outside sidebar closes sidebar (optional)
+  mainContent.addEventListener('click', () => {
+    if (sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+      sidebar.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // Category buttons
+  document.querySelectorAll('#sidebar button.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Toggle subcats visibility
+      if (btn.id === 'catVirtual') {
+        toggleSubcat('virtualSubcats');
+        hideSubcat('physicalSubcats');
+        hideSubcat('footballSubsubcats');
+        hideSubcat('clothingSubsubcats');
+      } else if (btn.id === 'catPhysical') {
+        toggleSubcat('physicalSubcats');
+        hideSubcat('virtualSubcats');
+      }
+      // Mark active category
+      document.querySelectorAll('#sidebar button.category-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      currentCategory = btn.id === 'catVirtual' ? 'virtual' : 'physical';
+      // Reset deeper selections
+      currentSubcategory = null;
+      currentSubSubcategory = null;
+      renderProducts();
+    });
+  });
+
+  // Subcategory buttons
+  document.querySelectorAll('#sidebar button.subcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const subcat = btn.dataset.subcat;
+      currentSubcategory = subcat;
+
+      // Show/hide subsubcats for physical
+      if (subcat === 'football') {
+        showSubcat('footballSubsubcats');
+        hideSubcat('clothingSubsubcats');
+      } else if (subcat === 'clothing') {
+        showSubcat('clothingSubsubcats');
+        hideSubcat('footballSubsubcats');
+      } else {
+        hideSubcat('footballSubsubcats');
+        hideSubcat('clothingSubsubcats');
+      }
+
+      // Mark active subcat
+      document.querySelectorAll('#sidebar button.subcat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Reset subsubcat
+      currentSubSubcategory = null;
+      renderProducts();
+    });
+  });
+
+  // Subsubcategory buttons
+  document.querySelectorAll('#sidebar button.subsubcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const subsubcat = btn.dataset.subsubcat;
+      currentSubSubcategory = subsubcat;
+
+      // Mark active subsubcat
+      document.querySelectorAll('#sidebar button.subsubcat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      renderProducts();
+    });
+  });
+
+  // Helpers to show/hide subcat/subsubcat divs
+  function toggleSubcat(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.style.display === 'block') el.style.display = 'none';
+    else el.style.display = 'block';
+  }
+  function showSubcat(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'block';
+  }
+  function hideSubcat(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'none';
+  }
+
+  // Render products based on current selections and filters
+  function renderProducts() {
+    let products = [];
+
+    if (!currentCategory) {
+      document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a category to see products.</p>';
+      return;
+    }
 
     if (currentCategory === 'virtual') {
-      if (!currentSubcategory) return;
-      productsToShow = allProducts.virtual[currentSubcategory] || [];
+      if (!currentSubcategory) {
+        document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a virtual product type.</p>';
+        return;
+      }
+      products = productsData.virtual[currentSubcategory] || [];
     } else if (currentCategory === 'physical') {
-      if (!currentSubcategory) return;
-      if (currentSubcategory === 'football') {
-        if (!currentSubSubcategory) return;
-        productsToShow = allProducts.physical.football[currentSubSubcategory] || [];
-      } else if (currentSubcategory === 'clothing') {
-        if (!currentSubSubcategory) return;
-        productsToShow = allProducts.physical.clothing[currentSubSubcategory] || [];
+      if (!currentSubcategory) {
+        document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a physical product type.</p>';
+        return;
+      }
+      if (currentSubSubcategory) {
+        products = (productsData.physical[currentSubcategory] && productsData.physical[currentSubcategory][currentSubSubcategory]) || [];
+      } else {
+        // Show all products under subcategory combined if no subsubcat selected
+        const subcatObj = productsData.physical[currentSubcategory];
+        if (subcatObj) {
+          products = Object.values(subcatObj).flat();
+        }
       }
     }
 
-    // Filter by search and price
-    const searchText = searchInput.value.trim().toLowerCase();
-    const maxPrice = parseFloat(priceFilter.value);
+    // Apply search filter
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    if (searchTerm) {
+      products = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+    }
 
-    productsToShow = productsToShow.filter(p => 
-      p.name.toLowerCase().includes(searchText) && p.price <= maxPrice
-    );
+    // Apply price filter
+    const priceVal = priceFilter.value;
+    if (priceVal !== 'all') {
+      products = products.filter(p => {
+        if (priceVal === '0-20') return p.price < 20;
+        if (priceVal === '20-50') return p.price >= 20 && p.price <= 50;
+        if (priceVal === '50-100') return p.price > 50 && p.price <= 100;
+        if (priceVal === '100+') return p.price > 100;
+        return true;
+      });
+    }
 
-    // Limit to 12 max products
-    productsToShow = productsToShow.slice(0, 12);
+    // Limit products to 12 max for demo
+    products = products.slice(0, 12);
 
-    // Render grid max 3 columns (handled by CSS grid)
-    productsToShow.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'product-item';
-      div.tabIndex = 0;
-      div.setAttribute('role', 'button');
-      div.setAttribute('aria-label', `${p.name} for ${formatPrice(p.price)}. Click to add to cart.`);
-      div.innerHTML = `
-        <img src="${p.img}" alt="${p.name}" />
+    // Render HTML
+    if (products.length === 0) {
+      document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">No products found.</p>';
+      return;
+    }
+    const html = products.map(p => `
+      <article tabindex="0" class="product-item" role="button" aria-pressed="false" aria-label="Add ${p.name} to cart" data-id="${p.id}">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" />
         <div class="product-name">${p.name}</div>
         <div class="price">${formatPrice(p.price)}</div>
-      `;
-      div.onclick = () => addToCart(p);
-      div.onkeypress = (e) => { if(e.key === 'Enter') addToCart(p); };
-      productsContainer.appendChild(div);
+      </article>
+    `).join('');
+    document.getElementById('products').innerHTML = html;
+
+    // Add click handlers to add to cart
+    document.querySelectorAll('.product-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        addToCart(id);
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const id = el.dataset.id;
+          addToCart(id);
+        }
+      });
     });
   }
 
-  // Add to cart
-  function addToCart(product) {
-    if (!cart[product.name]) {
-      cart[product.name] = { ...product, quantity: 1 };
-    } else {
-      cart[product.name].quantity++;
-      if (cart[product.name].quantity > 100) cart[product.name].quantity = 100;
+  // Get product info by id
+  function getProductById(id) {
+    for (const catKey in productsData) {
+      const cat = productsData[catKey];
+      if (catKey === 'virtual') {
+        for (const subcatKey in cat) {
+          const arr = cat[subcatKey];
+          for (const p of arr) if (p.id === id) return p;
+        }
+      } else if (catKey === 'physical') {
+        for (const subcatKey in cat) {
+          const subcat = cat[subcatKey];
+          for (const subsubcatKey in subcat) {
+            const arr = subcat[subsubcatKey];
+            for (const p of arr) if (p.id === id) return p;
+          }
+        }
+      }
     }
-    updateCart();
+    return null;
   }
 
-  // Update Cart display
-  function updateCart() {
-    cartItemsContainer.innerHTML = '';
+  // Add to cart logic
+  function addToCart(id) {
+    if (!cart[id]) cart[id] = 1;
+    else cart[id]++;
+    updateCartUI();
+    openCart();
+  }
+
+  // Update cart UI
+  function updateCartUI() {
+    cartItemsDiv.innerHTML = '';
     let total = 0;
-    let count = 0;
-    Object.values(cart).forEach(item => {
-      total += item.price * item.quantity;
-      count += item.quantity;
 
-      const div = document.createElement('div');
-      div.className = 'cart-item';
+    if (Object.keys(cart).length === 0) {
+      cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+      checkoutTotal.textContent = 'Total: $0.00';
+      promoMsg.textContent = '';
+      discountApplied = false;
+      usedPromo = false;
+      promoInput.value = '';
+      promoInput.disabled = false;
+      promoBtn.disabled = false;
+      return;
+    }
 
-      div.innerHTML = `
-        <img src="${item.img}" alt="${item.name}" />
+    for (const id in cart) {
+      const qty = cart[id];
+      const p = getProductById(id);
+      if (!p) continue;
+      total += p.price * qty;
+
+      const item = document.createElement('div');
+      item.className = 'cart-item';
+      item.setAttribute('role', 'listitem');
+      item.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" />
         <div class="cart-item-info">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-price">${formatPrice(item.price)}</div>
+          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-price">${formatPrice(p.price)}</div>
         </div>
-        <div class="cart-quantity" aria-label="Quantity controls">
-          <button class="qty-btn" aria-label="Decrease quantity">-</button>
-          <input type="number" min="1" max="100" value="${item.quantity}" class="qty-input" aria-label="Quantity input" />
-          <button class="qty-btn" aria-label="Increase quantity">+</button>
+        <div class="cart-quantity">
+          <button class="qty-btn" aria-label="Decrease quantity of ${p.name}" data-id="${id}" data-action="decrease">−</button>
+          <input class="qty-input" type="number" min="1" max="999" aria-label="Quantity of ${p.name}" data-id="${id}" value="${qty}" />
+          <button class="qty-btn" aria-label="Increase quantity of ${p.name}" data-id="${id}" data-action="increase">+</button>
         </div>
       `;
-
-      // Quantity buttons and input
-      const btnMinus = div.querySelector('.qty-btn:first-child');
-      const btnPlus = div.querySelector('.qty-btn:last-child');
-      const inputQty = div.querySelector('.qty-input');
-
-      btnMinus.onclick = () => {
-        if (item.quantity > 1) {
-          item.quantity--;
-          inputQty.value = item.quantity;
-          updateCart();
-        }
-      };
-      btnPlus.onclick = () => {
-        if (item.quantity < 100) {
-          item.quantity++;
-          inputQty.value = item.quantity;
-          updateCart();
-        }
-      };
-      inputQty.oninput = (e) => {
-        let val = parseInt(e.target.value);
-        if (isNaN(val) || val < 1) val = 1;
-        if (val > 100) val = 100;
-        item.quantity = val;
-        e.target.value = val;
-        updateCart();
-      };
-
-      cartItemsContainer.appendChild(div);
-    });
+      cartItemsDiv.appendChild(item);
+    }
 
     // Apply discount if any
-    if (discountApplied) {
-      total = total * 0.85; // 15% off
-    }
+    if (discountApplied) total *= 0.85;
 
     checkoutTotal.textContent = `Total: ${formatPrice(total)}`;
-    cartToggle.textContent = `Cart (${count})`;
   }
 
-  // Clear active states on all categories/subcats
-  function clearAllActive() {
-    clearActiveButtons(sidebar, '.category-btn');
-    clearActiveButtons(virtualSubcats, '.subcat-btn');
-    clearActiveButtons(physicalSubcats, '.subcat-btn');
-    clearActiveButtons(footballSubsubcats, '.subsubcat-btn');
-    clearActiveButtons(clothingSubsubcats, '.subsubcat-btn');
+  // Open/close cart
+  function openCart() {
+    cartOverlay.classList.add('visible');
+    cartOverlay.setAttribute('aria-hidden', 'false');
+    cartToggle.classList.add('hidden');
+  }
+  function closeCart() {
+    cartOverlay.classList.remove('visible');
+    cartOverlay.setAttribute('aria-hidden', 'true');
+    cartToggle.classList.remove('hidden');
   }
 
-  // Event listeners for category buttons
-  catVirtualBtn.onclick = () => {
-    clearAllActive();
-    catVirtualBtn.classList.add('active');
-    virtualSubcats.style.display = 'block';
-    physicalSubcats.style.display = 'none';
-    footballSubsubcats.style.display = 'none';
-    clothingSubsubcats.style.display = 'none';
-    currentCategory = 'virtual';
-    currentSubcategory = null;
-    currentSubSubcategory = null;
-    productsContainer.innerHTML = '';
-  };
-  catPhysicalBtn.onclick = () => {
-    clearAllActive();
-    catPhysicalBtn.classList.add('active');
-    virtualSubcats.style.display = 'none';
-    physicalSubcats.style.display = 'block';
-    footballSubsubcats.style.display = 'none';
-    clothingSubsubcats.style.display = 'none';
-    currentCategory = 'physical';
-    currentSubcategory = null;
-    currentSubSubcategory = null;
-    productsContainer.innerHTML = '';
-  };
-
-  // Virtual subcats clicks
-  virtualSubcats.querySelectorAll('.subcat-btn').forEach(btn => {
-    btn.onclick = () => {
-      clearActiveButtons(virtualSubcats, '.subcat-btn');
-      btn.classList.add('active');
-      currentSubcategory = btn.dataset.subcat;
-      currentSubSubcategory = null;
-      footballSubsubcats.style.display = 'none';
-      clothingSubsubcats.style.display = 'none';
-      renderProducts();
-    };
+  // Cart toggle button
+  cartToggle.addEventListener('click', () => {
+    if (cartOverlay.classList.contains('visible')) closeCart();
+    else openCart();
   });
 
-  // Physical subcats clicks
-  physicalSubcats.querySelectorAll('.subcat-btn').forEach(btn => {
-    btn.onclick = () => {
-      clearActiveButtons(physicalSubcats, '.subcat-btn');
-      btn.classList.add('active');
-      currentSubcategory = btn.dataset.subcat;
-      currentSubSubcategory = null;
-      footballSubsubcats.style.display = 'none';
-      clothingSubsubcats.style.display = 'none';
-      if (currentSubcategory === 'football') {
-        footballSubsubcats.style.display = 'block';
-        clothingSubsubcats.style.display = 'none';
-      } else if (currentSubcategory === 'clothing') {
-        footballSubsubcats.style.display = 'none';
-        clothingSubsubcats.style.display = 'block';
-      }
-      renderProducts();
-    };
-  });
-
-  // Football subsubcats clicks
-  footballSubsubcats.querySelectorAll('.subsubcat-btn').forEach(btn => {
-    btn.onclick = () => {
-      clearActiveButtons(footballSubsubcats, '.subsubcat-btn');
-      btn.classList.add('active');
-      currentSubSubcategory = btn.dataset.subsubcat;
-      renderProducts();
-    };
-  });
-
-  // Clothing subsubcats clicks
-  clothingSubsubcats.querySelectorAll('.subsubcat-btn').forEach(btn => {
-    btn.onclick = () => {
-      clearActiveButtons(clothingSubsubcats, '.subsubcat-btn');
-      btn.classList.add('active');
-      currentSubSubcategory = btn.dataset.subsubcat;
-      renderProducts();
-    };
-  });
-
-  // Search and price filter event
-  searchInput.oninput = () => renderProducts();
-  priceFilter.onchange = () => renderProducts();
-
-  // Sidebar toggle
-  sidebarToggle.onclick = () => {
-    sidebarOpen = !sidebarOpen;
-    if (sidebarOpen) {
-      sidebar.style.display = 'block';
-      sidebarToggle.setAttribute('aria-expanded', 'true');
-    } else {
-      sidebar.style.display = 'none';
-      sidebarToggle.setAttribute('aria-expanded', 'false');
+  // Clicking outside cart closes it
+  mainContent.addEventListener('click', () => {
+    if (cartOverlay.classList.contains('visible')) {
+      closeCart();
     }
-  };
+  });
 
-  // Cart toggle
-  cartToggle.onclick = () => {
-    if (cartOverlay.style.display === 'block') {
-      cartOverlay.style.display = 'none';
-      cartToggle.setAttribute('aria-expanded', 'false');
-    } else {
-      cartOverlay.style.display = 'block';
-      cartToggle.setAttribute('aria-expanded', 'true');
-      updateCart();
+  // Stop clicks inside cart from closing
+  cartOverlay.addEventListener('click', e => {
+    e.stopPropagation();
+  });
+
+  // Quantity buttons & input handler (event delegation)
+  cartItemsDiv.addEventListener('click', e => {
+    if (!e.target.classList.contains('qty-btn')) return;
+    const id = e.target.dataset.id;
+    const action = e.target.dataset.action;
+    if (!id || !action) return;
+    if (!cart[id]) return;
+
+    if (action === 'increase') {
+      if (cart[id] < 999) cart[id]++;
+    } else if (action === 'decrease') {
+      if (cart[id] > 1) cart[id]--;
     }
-  };
+    updateCartUI();
+  });
 
-  // Promo code application
-  promoBtn.onclick = () => {
-    const code = promoInput.value.trim().toUpperCase();
-    if (code === 'DISCOUNT15' && !discountApplied) {
+  cartItemsDiv.addEventListener('input', e => {
+    if (!e.target.classList.contains('qty-input')) return;
+    const id = e.target.dataset.id;
+    if (!id) return;
+    let val = parseInt(e.target.value);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 999) val = 999;
+    cart[id] = val;
+    updateCartUI();
+  });
+
+  // Promo code logic
+  promoBtn.addEventListener('click', () => {
+    const code = promoInput.value.trim().toLowerCase();
+    if (!code) {
+      promoMsg.textContent = 'Please enter a promo code.';
+      return;
+    }
+    if (usedPromo) {
+      promoMsg.textContent = 'Promo code already used.';
+      return;
+    }
+    if (code === 'fortnite15') {
       discountApplied = true;
-      promoMsg.textContent = '15% discount applied!';
-      promoMsg.style.color = 'green';
-      updateCart();
-    } else if (discountApplied) {
-      promoMsg.textContent = 'Discount already applied.';
-      promoMsg.style.color = 'orange';
+      usedPromo = true;
+      promoMsg.textContent = 'Promo code applied! 15% discount.';
+      promoInput.disabled = true;
+      promoBtn.disabled = true;
+      updateCartUI();
     } else {
       promoMsg.textContent = 'Invalid promo code.';
-      promoMsg.style.color = 'red';
     }
-  };
+  });
 
-  // Initialize: Hide sidebar and cart initially
-  sidebar.style.display = 'none';
-  cartOverlay.style.display = 'none';
-  sidebarToggle.setAttribute('aria-expanded', 'false');
-  cartToggle.setAttribute('aria-expanded', 'false');
+  // Search and filter listeners
+  searchInput.addEventListener('input', renderProducts);
+  priceFilter.addEventListener('change', renderProducts);
+
+  // Initialize by selecting the first category
+  document.getElementById('catVirtual').click();
 </script>
-
-<style>
-  #page {
-    display: flex;
-    font-family: Arial, sans-serif;
-  }
-  #sidebar {
-    width: 260px;
-    background: #f9f9f9;
-    border-right: 1px solid #ccc;
-    padding: 1em;
-    overflow-y: auto;
-  }
-  #sidebar button {
-    display: block;
-    margin: 0.3em 0;
-    width: 100%;
-    background: #eee;
-    border: none;
-    padding: 0.5em;
-    cursor: pointer;
-  }
-  #sidebar button.active {
-    background: #007bff;
-    color: white;
-  }
-  #products {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
-    gap: 1em;
-    padding: 1em;
-  }
-  .product-item {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 0.5em;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .product-item img {
-    max-width: 100%;
-    height: 120px;
-    object-fit: contain;
-  }
-  .product-name {
-    margin-top: 0.5em;
-    font-weight: bold;
-    text-align: center;
-  }
-  .price {
-    margin-top: 0.3em;
-    color: green;
-    font-weight: bold;
-  }
-  #cartOverlay {
-    position: fixed;
-    top: 3em;
-    right: 1em;
-    width: 320px;
-    max-height: 80vh;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #aaa;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    padding: 1em;
-    display: none;
-    z-index: 1000;
-  }
-  #cartItems .cart-item {
-    display: flex;
-    margin-bottom: 1em;
-    align-items: center;
-  }
-  #cartItems .cart-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    margin-right: 0.5em;
-  }
-  .cart-item-info {
-    flex: 1;
-  }
-  .cart-item-name {
-    font-weight: bold;
-  }
-  .cart-item-price {
-    color: green;
-  }
-  .cart-quantity {
-    display: flex;
-    align-items: center;
-  }
-  .qty-btn {
-    width: 25px;
-    height: 25px;
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-    margin: 0 0.2em;
-    border-radius: 3px;
-  }
-  .qty-input {
-    width: 40px;
-    text-align: center;
-  }
-  #promoSection {
-    margin-top: 1em;
-  }
-  #promoInput {
-    width: 60%;
-    padding: 0.3em;
-  }
-  #promoBtn {
-    padding: 0.3em 0.5em;
-    margin-left: 0.5em;
-    cursor: pointer;
-  }
-</style>
+</body>
+</html>
