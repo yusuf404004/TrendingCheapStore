@@ -482,4 +482,132 @@
         const discountedTotal = total - discountAmount;
         cartTotal.innerHTML = `
           Total: <s>$${total.toFixed(2)}</s> 
-          <strong style="color:#27ae60;">$${discountedTotal.to
+          <strong style="color:#27ae60;">$${discountedTotal.toFixed(2)} (-15%)</strong>
+        `;
+      } else {
+        cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+      }
+    }
+
+    function renderCart() {
+      cartItemsContainer.innerHTML = '';
+      for (const key in cart) {
+        const item = cart[key];
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.setAttribute('role', 'group');
+        div.setAttribute('aria-label', `${item.name}, quantity ${item.qty}, price $${(item.price * item.qty).toFixed(2)}`);
+
+        div.innerHTML = `
+          <div class="cart-item-name">${item.name}</div>
+          <button aria-label="Decrease quantity of ${item.name}" class="cart-item-qty-btn" data-action="decrease" data-key="${key}">−</button>
+          <span aria-live="polite" aria-atomic="true">${item.qty}</span>
+          <button aria-label="Increase quantity of ${item.name}" class="cart-item-qty-btn" data-action="increase" data-key="${key}">+</button>
+          <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+          <button aria-label="Remove ${item.name} from cart" class="cart-item-remove-btn" data-key="${key}">&times;</button>
+        `;
+        cartItemsContainer.appendChild(div);
+      }
+      updateCartCount();
+      updateCartTotal();
+    }
+
+    function addToCart(name, price) {
+      if (cart[name]) {
+        cart[name].qty++;
+      } else {
+        cart[name] = { name, price, qty: 1 };
+      }
+      renderCart();
+    }
+
+    // Handle cart buttons (increase, decrease, remove)
+    cartItemsContainer.addEventListener('click', (e) => {
+      const target = e.target;
+      if (target.classList.contains('cart-item-qty-btn')) {
+        const key = target.dataset.key;
+        if (!key) return;
+        if (target.dataset.action === 'increase') {
+          cart[key].qty++;
+        } else if (target.dataset.action === 'decrease') {
+          if (cart[key].qty > 1) {
+            cart[key].qty--;
+          } else {
+            delete cart[key];
+          }
+        }
+        renderCart();
+      }
+      if (target.classList.contains('cart-item-remove-btn')) {
+        const key = target.dataset.key;
+        if (key) {
+          delete cart[key];
+          renderCart();
+        }
+      }
+    });
+
+    cartToggleBtn.addEventListener('click', () => {
+      const expanded = cartToggleBtn.getAttribute('aria-expanded') === 'true';
+      if (!expanded) {
+        cartSidebar.classList.add('open');
+        cartSidebar.setAttribute('aria-hidden', 'false');
+        cartSidebar.focus();
+        cartToggleBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        cartSidebar.classList.remove('open');
+        cartSidebar.setAttribute('aria-hidden', 'true');
+        cartToggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    closeCartBtn.addEventListener('click', () => {
+      cartSidebar.classList.remove('open');
+      cartSidebar.setAttribute('aria-hidden', 'true');
+      cartToggleBtn.setAttribute('aria-expanded', 'false');
+      cartToggleBtn.focus();
+    });
+
+    // Promo code logic
+    function applyPromoCode() {
+      const code = promoCodeInput.value.trim().toUpperCase();
+      if (promoUsed) {
+        promoMessage.textContent = "Promo code already used.";
+        promoMessage.className = "error";
+        return;
+      }
+      if (code === promoCodeValid) {
+        if (Object.keys(cart).length === 0) {
+          promoMessage.textContent = "Add items to your cart before applying the promo code.";
+          promoMessage.className = "error";
+          return;
+        }
+        discountApplied = true;
+        promoUsed = true;
+        localStorage.setItem(promoUsedKey, 'true');
+        promoMessage.textContent = "Promo code applied! You saved 15%.";
+        promoMessage.className = "success";
+        promoCodeInput.disabled = true;
+        applyPromoBtn.disabled = true;
+        updateCartTotal();
+      } else {
+        promoMessage.textContent = "Invalid promo code.";
+        promoMessage.className = "error";
+      }
+    }
+
+    applyPromoBtn.addEventListener('click', applyPromoCode);
+
+    // Optional: allow pressing Enter in promo input
+    promoCodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        applyPromoCode();
+      }
+    });
+
+    // Initialize
+    renderCart();
+  </script>
+
+</body>
+</html>
