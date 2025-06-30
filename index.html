@@ -1,40 +1,101 @@
-header>
-    <h1>TrendingCheapStore</h1>
-    <p>Top Trending Products with Fast Global Shipping</p>
-  </header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trending Cheap Store</title>
+  <style>
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #cartSidebar button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
 
-  <nav>
-    <a href="#products">Products</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </nav>
-
-  <div class="hero">
-    <h2>Discover Hot New Items</h2>
-    <p>Curated for style, function, and value.</p>
+  <!-- Your page content goes here -->
+  
+  <!-- Products Grid -->
+  <div id="products" style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <!-- Example product -->
+    <div class="product" style="border: 1px solid #ccc; padding: 10px; width: 200px;">
+      <h3>Sample Product 1</h3>
+      <p>$19.99</p>
+      <button onclick="addToCart('Sample Product 1', 19.99)">Add to Cart</button>
+    </div>
   </div>
 
-  <section class="products" id="products">
-    <div class="product">
-      <img src="https://via.placeholder.com/200x150" alt="Product 1" />
-      <h3>Smart Gadget</h3>
-      <p>$29.99</p>
-      <button>Add to Cart</button>
-    </div>
-    <div class="product">
-      <img src="https://via.placeholder.com/200x150" alt="Product 2" />
-      <h3>Wireless Earbuds</h3>
-      <p>$49.99</p>
-      <button>Add to Cart</button>
-    </div>
-    <div class="product">
-      <img src="https://via.placeholder.com/200x150" alt="Product 3" />
-      <h3>Home Fitness Band</h3>
-      <p>$39.99</p>
-      <button>Add to Cart</button>
-    </div>
-  </section>
+  <!-- Cart Sidebar -->
+  <div id="cartSidebar" style="position: fixed; top: 0; right: 0; width: 300px; height: 100%; background: #f9f9f9; border-left: 1px solid #ccc; padding: 20px; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s ease;">
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <p>Total: $<span id="cartTotal">0.00</span></p>
+    <button onclick="checkout()">Checkout</button>
+    <button onclick="toggleCart()">Close</button>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 TrendingCheapStore. All rights reserved.</p>
-  </footer>
+  <!-- Cart Toggle Button -->
+  <button onclick="toggleCart()" style="position: fixed; top: 20px; right: 320px; padding: 10px 20px;">🛒 Cart</button>
+
+  <script>
+    let cart = [];
+
+    function toggleCart() {
+      const sidebar = document.getElementById('cartSidebar');
+      const isOpen = sidebar.style.transform === 'translateX(0%)';
+      sidebar.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0%)';
+    }
+
+    function addToCart(name, price) {
+      const existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      updateCart();
+      toggleCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cartItems');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        cartItems.innerHTML += `
+          <div style="margin-bottom: 10px;">
+            <strong>${item.name}</strong> x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}
+            <button onclick="removeFromCart('${item.name}')">Remove</button>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotal').textContent = total.toFixed(2);
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(item => item.name !== name);
+      updateCart();
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      alert('Checkout functionality coming soon!');
+    }
+  </script>
+
+</body>
+</html>
