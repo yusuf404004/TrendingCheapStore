@@ -1,803 +1,454 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TrendingCheapStore</title>
-<style>
-  /* Reset and base styles */
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #222;
-    height: 100vh; overflow-x: hidden;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrendingCheapStore - Updated Shop with Football Sets</title>
+  <style>
+    /* Reset and basics */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #111;
+      color: #eee;
+      transition: background-image 0.8s ease-in-out;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+    }
+    h1,h2,h3,h4 {
+      margin: 0;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    h2 {
+      font-size: 2.2rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.3rem;
+      margin-bottom: 1rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.1rem;
+      margin: 0.4rem 0 0.2rem 0;
+    }
 
-  /* Layout */
-  #container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-  }
-  #sidebar {
-    background: #222;
-    color: white;
-    width: 260px;
-    position: fixed;
-    top: 0; left: -260px;
-    height: 100vh;
-    padding: 20px;
-    overflow-y: auto;
-    transition: left 0.3s ease;
-    z-index: 10;
-  }
-  #sidebar.open {
-    left: 0;
-  }
-  #sidebar h2 {
-    margin-top: 0;
-  }
-  #sidebar button.category-btn, 
-  #sidebar button.subcat-btn,
-  #sidebar button.subsubcat-btn {
-    width: 100%;
-    text-align: left;
-    background: #333;
-    border: none;
-    padding: 8px 12px;
-    margin: 5px 0;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.2s;
-  }
-  #sidebar button.category-btn:hover,
-  #sidebar button.subcat-btn:hover,
-  #sidebar button.subsubcat-btn:hover {
-    background: #555;
-  }
-  #sidebar button.active {
-    background: #0a84ff;
-  }
-  #sidebar .subcat-container,
-  #sidebar .subsubcat-container {
-    margin-left: 12px;
-    margin-top: 5px;
-  }
-  #sidebar .subcat-container, #sidebar .subsubcat-container {
-    display: none;
-  }
-  #sidebar .subcat-container.open,
-  #sidebar .subsubcat-container.open {
-    display: block;
-  }
+    /* Container */
+    #main-container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
 
-  /* Toggle menu button */
-  #menuToggle {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    background: #0a84ff;
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 20;
-  }
+    /* Store Title + Description */
+    #store-header {
+      margin-bottom: 3rem;
+      text-align: center;
+      color: #ddd;
+    }
+    #store-description {
+      font-size: 1.2rem;
+      max-width: 900px;
+      margin: 0 auto 2rem auto;
+      line-height: 1.5;
+      color: #bbb;
+    }
 
-  /* Main content area */
-  #mainContent {
-    flex-grow: 1;
-    margin-left: 0;
-    padding: 20px;
-    transition: margin-left 0.3s ease;
-    overflow-y: auto;
-    height: 100vh;
-  }
-  #container.sidebar-open #mainContent {
-    margin-left: 260px;
-  }
+    /* General Grid for Store Products (3 per row) */
+    #store-products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 5rem;
+    }
+    @media (max-width: 1000px) {
+      #store-products {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      #store-products {
+        grid-template-columns: 1fr;
+      }
+    }
 
-  /* Explanation on front page */
-  #explanation {
-    max-width: 900px;
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-  }
-  #explanation h1 {
-    margin-top: 0;
-    color: #0a84ff;
-  }
-  #explanation ul {
-    margin-left: 20px;
-  }
+    /* Product Cards Store */
+    .product-card {
+      background: rgba(30,30,30,0.85);
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    .product-card:hover {
+      background: rgba(255,255,255,0.12);
+    }
+    .product-card img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      object-fit: contain;
+      height: 160px;
+    }
+    .product-price {
+      font-weight: 700;
+      margin-top: auto;
+      font-size: 1.1rem;
+    }
 
-  /* Filters for Virtual */
-  #filters {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
-    gap: 10px;
-  }
-  #filters input[type="search"],
-  #filters select {
-    padding: 7px 10px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    flex: 1 1 200px;
-  }
+    /* FOOTBALL SHOP SPECIFIC STYLES */
 
-  /* Products grid */
-  #products {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    max-width: 900px;
-    margin: 0 auto 50px;
-  }
-  .product-item {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    user-select: none;
-    transition: box-shadow 0.2s ease;
-  }
-  .product-item:hover {
-    box-shadow: 0 6px 15px rgb(0 0 0 / 0.15);
-  }
-  .product-item img {
-    max-width: 100%;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    object-fit: contain;
-    height: 150px;
-  }
-  .product-name {
-    font-weight: bold;
-    padding: 12px 15px 5px;
-    font-size: 16px;
-    flex-grow: 1;
-  }
-  .price {
-    padding: 0 15px 15px;
-    font-size: 15px;
-    color: #0a84ff;
-    font-weight: 600;
-  }
+    #footballShop {
+      margin-bottom: 5rem;
+    }
+    .country-section {
+      margin-bottom: 5rem;
+      padding: 1rem 1rem 2rem 1rem;
+      border-radius: 12px;
+      background: rgba(20, 20, 20, 0.85);
+      box-shadow: 0 0 15px rgba(0,0,0,0.9);
+    }
+    .products-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      margin-top: 0.7rem;
+    }
+    @media (max-width: 1300px) {
+      .products-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 700px) {
+      .products-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 450px) {
+      .products-row {
+        grid-template-columns: 1fr;
+      }
+    }
 
-  /* Cart button */
-  #cartToggle {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    background: #0a84ff;
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 20;
-  }
-  #cartToggle.hidden {
-    display: none;
-  }
+    /* MODAL */
+    #productModal {
+      display: none;
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #productModal .modal-content {
+      background: #111;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 90%;
+      padding: 1.5rem;
+      color: #eee;
+      position: relative;
+      text-align: center;
+    }
+    #productModal .modal-content img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      object-fit: contain;
+      height: 180px;
+    }
+    #productModal .modal-title {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    #productModal .modal-price {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+    #productModal .modal-desc {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+    #productModal button.close-btn {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: #eee;
+      cursor: pointer;
+    }
+    #productModal button.add-cart-btn {
+      padding: 0.6rem 1.2rem;
+      background: #333;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #productModal button.add-cart-btn:hover {
+      background: #555;
+    }
 
-  /* Cart overlay */
-  #cartOverlay {
-    position: fixed;
-    top: 0; right: 0;
-    width: 360px;
-    height: 100vh;
-    background: white;
-    box-shadow: -5px 0 15px rgb(0 0 0 / 0.3);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 30;
-    display: flex;
-    flex-direction: column;
-  }
-  #cartOverlay.visible {
-    transform: translateX(0);
-  }
-  #cartHeader {
-    padding: 15px 20px;
-    font-weight: bold;
-    font-size: 18px;
-    background: #0a84ff;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  #cartCloseBtn {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-  }
-
-  /* Cart items */
-  #cartItems {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 15px 20px;
-  }
-  .cart-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .cart-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-right: 12px;
-  }
-  .cart-item-info {
-    flex-grow: 1;
-  }
-  .cart-item-name {
-    font-weight: bold;
-    font-size: 15px;
-  }
-  .cart-item-price {
-    color: #0a84ff;
-    margin-top: 3px;
-    font-size: 14px;
-  }
-  .cart-quantity {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .qty-btn {
-    background: #0a84ff;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    user-select: none;
-    line-height: 1;
-  }
-  .qty-input {
-    width: 45px;
-    text-align: center;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 3px;
-  }
-
-  /* Cart footer */
-  #cartFooter {
-    padding: 15px 20px;
-    border-top: 1px solid #ddd;
-  }
-  #checkoutTotal {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #0a84ff;
-  }
-  #promoContainer {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 5px;
-  }
-  #promoInput {
-    flex-grow: 1;
-    padding: 8px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  #promoBtn {
-    background: #0a84ff;
-    border: none;
-    color: white;
-    padding: 8px 14px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  #promoMsg {
-    color: #f44336;
-    font-size: 13px;
-    min-height: 18px;
-  }
-</style>
+    /* CART button */
+    #cart-button {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background: #222;
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: background-color 0.3s ease;
+    }
+    #cart-button:hover {
+      background: #444;
+    }
+  </style>
 </head>
 <body>
 
-<button id="menuToggle" aria-label="Toggle menu">☰ Menu</button>
-<button id="cartToggle" aria-label="Open cart">🛒 Cart (0)</button>
+  <div id="main-container">
 
-<div id="container">
-  <nav id="sidebar" aria-label="Store Categories">
-    <h2>Categories</h2>
-    <button class="category-btn" id="catVirtual" aria-expanded="false">Virtual</button>
-    <div id="virtualSubcats" class="subcat-container">
-      <button class="subcat-btn" data-subcat="fortnite" aria-expanded="false">Fortnite</button>
-      <button class="subcat-btn" data-subcat="vbucks" aria-expanded="false">V-Bucks (Amounts)</button>
-    </div>
-
-    <button class="category-btn" id="catPhysical" aria-expanded="false">Physical</button>
-    <div id="physicalSubcats" class="subcat-container">
-      <button class="subcat-btn" data-subcat="football" aria-expanded="false">Football</button>
-      <button class="subcat-btn" data-subcat="clothing" aria-expanded="false">Clothing</button>
-    </div>
-
-    <div id="footballSubsubcats" class="subsubcat-container">
-      <button class="subsubcat-btn" data-subsubcat="jerseys">Jerseys</button>
-      <button class="subsubcat-btn" data-subsubcat="mysteryboxes">Mystery Boxes</button>
-      <button class="subsubcat-btn" data-subsubcat="sets">Sets</button>
-    </div>
-
-    <div id="clothingSubsubcats" class="subsubcat-container">
-      <button class="subsubcat-btn" data-subsubcat="socks">Socks</button>
-      <button class="subsubcat-btn" data-subsubcat="shirts">Shirts</button>
-      <button class="subsubcat-btn" data-subsubcat="tshirts">T-Shirts</button>
-      <button class="subsubcat-btn" data-subsubcat="pants">Pants</button>
-      <button class="subsubcat-btn" data-subsubcat="shorts">Shorts</button>
-      <button class="subsubcat-btn" data-subsubcat="swimmingshorts">Swimming Shorts</button>
-    </div>
-  </nav>
-
-  <main id="mainContent" tabindex="0" aria-label="Main Store Content">
-    <section id="explanation">
-      <h1>Welcome to TrendingCheapStore!</h1>
-      <p>Here's how our shop works:</p>
-      <ul>
-        <li>Use the <strong>Menu</strong> button (top-left) to browse product categories and subcategories.</li>
-        <li>Click on <em>Virtual</em> for digital goods like Fortnite accounts or V-Bucks.</li>
-        <li>Click on <em>Physical</em> for real-world products like Football items or Clothing.</li>
-        <li>Within categories, select subcategories and sub-subcategories to filter products.</li>
-        <li>You can search products and filter by price in Virtual category.</li>
-        <li>Click a product to add it to your cart.</li>
-        <li>Open your cart with the <strong>Cart</strong> button (top-right).</li>
-        <li>Adjust quantities in the cart by clicking +/- or typing the amount.</li>
-        <li>Apply promo code <strong>RELEASE</strong> once per session for 15% off your total.</li>
-        <li>Click outside the cart or on the main store area to close the cart.</li>
-      </ul>
-      <p>Enjoy shopping!</p>
-    </section>
-
-    <div id="filters" aria-label="Product filters" hidden>
-      <input type="search" id="searchInput" placeholder="Search products..." aria-label="Search products" />
-      <select id="priceFilter" aria-label="Filter by price">
-        <option value="all">All prices</option>
-        <option value="0-20">Under $20</option>
-        <option value="20-50">$20 - $50</option>
-        <option value="50-100">$50 - $100</option>
-        <option value="100+">Over $100</option>
-      </select>
-    </div>
-
-    <section id="products" aria-live="polite" aria-atomic="true">
-      <!-- Products will appear here -->
-    </section>
-  </main>
-
-  <aside id="cartOverlay" aria-hidden="true" role="region" aria-label="Shopping cart">
-    <header id="cartHeader">
-      Cart
-      <button id="cartCloseBtn" aria-label="Close cart">×</button>
+    <header id="store-header">
+      <h1>TrendingCheapStore</h1>
+      <p id="store-description">
+        Welcome to TrendingCheapStore! Browse through our physical and virtual products.
+        Use the menu to explore football gear sets sorted by countries or check out our gaming section.
+        Click on any product to see details and add it to your cart.
+      </p>
     </header>
-    <div id="cartItems" role="list" tabindex="0" aria-label="Items in your cart">
-      <p>Your cart is empty.</p>
-    </div>
-    <footer id="cartFooter">
-      <div id="checkoutTotal">Total: $0.00</div>
-      <div id="promoContainer">
-        <input type="text" id="promoInput" aria-label="Enter promo code" placeholder="Enter promo code" />
-        <button id="promoBtn">Apply</button>
+
+    <!-- Existing store products example -->
+    <section id="store-products">
+      <div class="product-card" onclick="showProductInfo('Wireless Headphones', 65, 'https://images.unsplash.com/photo-1512499617640-c2f9999417ef?auto=format&fit=crop&w=400&q=80', 'High-quality wireless headphones with noise cancellation.')">
+        <img src="https://images.unsplash.com/photo-1512499617640-c2f9999417ef?auto=format&fit=crop&w=400&q=80" alt="Wireless Headphones" />
+        <h4>Wireless Headphones</h4>
+        <p class="product-price">€65</p>
       </div>
-      <div id="promoMsg" aria-live="assertive" role="alert"></div>
-    </footer>
-  </aside>
-</div>
+      <div class="product-card" onclick="showProductInfo('Gaming Mouse', 40, 'https://images.unsplash.com/photo-1587202372775-20e18aa3bb2c?auto=format&fit=crop&w=400&q=80', 'Precision gaming mouse with RGB lighting.')">
+        <img src="https://images.unsplash.com/photo-1587202372775-20e18aa3bb2c?auto=format&fit=crop&w=400&q=80" alt="Gaming Mouse" />
+        <h4>Gaming Mouse</h4>
+        <p class="product-price">€40</p>
+      </div>
+      <div class="product-card" onclick="showProductInfo('Mechanical Keyboard', 80, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80', 'RGB mechanical keyboard with customizable keys.')">
+        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80" alt="Mechanical Keyboard" />
+        <h4>Mechanical Keyboard</h4>
+        <p class="product-price">€80</p>
+      </div>
+    </section>
 
-<script>
-  // Data for products (images from public sources)
-  const productsData = {
-    virtual: {
-      fortnite: [
-        { id: 'fnacc1', name: 'Fortnite Account - Level 50', price: 35, image: 'https://i.imgur.com/nqA2d2j.png' },
-        { id: 'fnacc2', name: 'Fortnite Account - Level 75', price: 50, image: 'https://i.imgur.com/nqA2d2j.png' },
-        { id: 'fnacc3', name: 'Fortnite Account - Level 100', price: 70, image: 'https://i.imgur.com/nqA2d2j.png' },
-      ],
-      vbucks: [
-        { id: 'vbucks1000', name: '1000 V-Bucks', price: 10, image: 'https://i.imgur.com/W9oih3b.png' },
-        { id: 'vbucks2500', name: '2500 V-Bucks', price: 23, image: 'https://i.imgur.com/W9oih3b.png' },
-        { id: 'vbucks5000', name: '5000 V-Bucks', price: 45, image: 'https://i.imgur.com/W9oih3b.png' },
-      ]
-    },
-    physical: {
-      football: {
-        jerseys: [
-          { id: 'fcbjersey', name: 'FC Barcelona Jersey', price: 85, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
-          { id: 'realmadridjersey', name: 'Real Madrid Jersey', price: 90, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
-          { id: 'psgjersey', name: 'Paris Saint-Germain Jersey', price: 95, image: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C._home_jersey_2020-21.png' },
-        ],
-        mysteryboxes: [
-          { id: 'mysterybox1', name: 'Football Mystery Box 1', price: 40, image: 'https://i.imgur.com/mysterybox.png' },
-          { id: 'mysterybox2', name: 'Football Mystery Box 2', price: 60, image: 'https://i.imgur.com/mysterybox.png' },
-        ],
-        sets: [
-          { id: 'fcbset', name: 'FC Barcelona Set (Jersey + Shorts)', price: 130, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
-          { id: 'realmadridset', name: 'Real Madrid Set (Jersey + Shorts)', price: 140, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
-        ]
-      },
-      clothing: {
-        socks: [
-          { id: 'sock1', name: 'Cotton Socks', price: 8, image: 'https://i.imgur.com/8VWwW9U.png' },
-          { id: 'sock2', name: 'Sports Socks', price: 12, image: 'https://i.imgur.com/8VWwW9U.png' },
-        ],
-        shirts: [
-          { id: 'shirt1', name: 'Casual Shirt', price: 30, image: 'https://i.imgur.com/8t8tJxG.png' },
-          { id: 'shirt2', name: 'Formal Shirt', price: 50, image: 'https://i.imgur.com/8t8tJxG.png' },
-        ],
-        tshirts: [
-          { id: 'tshirt1', name: 'Basic T-Shirt', price: 20, image: 'https://i.imgur.com/pxmL8Iy.png' },
-          { id: 'tshirt2', name: 'Graphic T-Shirt', price: 28, image: 'https://i.imgur.com/pxmL8Iy.png' },
-        ],
-        pants: [
-          { id: 'pants1', name: 'Jeans', price: 40, image: 'https://i.imgur.com/NhEbE3x.png' },
-          { id: 'pants2', name: 'Chinos', price: 45, image: 'https://i.imgur.com/NhEbE3x.png' },
-        ],
-        shorts: [
-          { id: 'shorts1', name: 'Denim Shorts', price: 25, image: 'https://i.imgur.com/6ULxPRd.png' },
-          { id: 'shorts2', name: 'Cargo Shorts', price: 30, image: 'https://i.imgur.com/6ULxPRd.png' },
-        ],
-        swimmingshorts: [
-          { id: 'swim1', name: 'Beach Swimming Shorts', price: 18, image: 'https://i.imgur.com/FZQUxqJ.png' },
-          { id: 'swim2', name: 'Pool Swimming Shorts', price: 20, image: 'https://i.imgur.com/FZQUxqJ.png' },
-        ]
-      }
-    }
-  };
+    <!-- FOOTBALL SHOP START -->
 
-  // State
-  let currentCategory = null;
-  let currentSubcategory = null;
-  let currentSubsubcategory = null;
-  let cart = {};
-  let discountApplied = false;
-  let promoUsed = false;
+    <section id="footballShop">
+      <!-- Turkey Section -->
+      <section class="country-section" data-country="turkey" data-flag="https://flagcdn.com/w320/tr.png">
+        <h2>Turkey</h2>
+        <h3>Jerseys</h3>
+        <div class="products-row" id="turkey-jerseys">
+          <div class="product-card" onclick="showProductInfo('Galatasaray Home Jersey', 55, 'https://upload.wikimedia.org/wikipedia/en/thumb/9/91/Galatasaray_S.K._logo.svg/1200px-Galatasaray_S.K._logo.svg.png', 'Official Galatasaray 2023 home jersey with club badge.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/Galatasaray_S.K._logo.svg/1200px-Galatasaray_S.K._logo.svg.png" alt="Galatasaray Home Jersey" />
+            <h4>Galatasaray Home Jersey</h4>
+            <p class="product-price">€55</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Fenerbahçe Away Jersey', 52, 'https://upload.wikimedia.org/wikipedia/en/thumb/8/89/Fenerbahce_SK_logo.svg/1200px-Fenerbahce_SK_logo.svg.png', 'Official Fenerbahçe 2023 away jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/89/Fenerbahce_SK_logo.svg/1200px-Fenerbahce_SK_logo.svg.png" alt="Fenerbahçe Away Jersey" />
+            <h4>Fenerbahçe Away Jersey</h4>
+            <p class="product-price">€52</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Beşiktaş Third Jersey', 50, 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Besiktas_JK_logo.svg/1200px-Besiktas_JK_logo.svg.png', 'Beşiktaş 2023 third kit jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Besiktas_JK_logo.svg/1200px-Besiktas_JK_logo.svg.png" alt="Beşiktaş Third Jersey" />
+            <h4>Beşiktaş Third Jersey</h4>
+            <p class="product-price">€50</p>
+          </div>
+        </div>
 
-  // DOM Elements
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.getElementById('sidebar');
-  const container = document.getElementById('container');
-  const cartToggle = document.getElementById('cartToggle');
-  const cartOverlay = document.getElementById('cartOverlay');
-  const cartCloseBtn = document.getElementById('cartCloseBtn');
-  const cartItemsEl = document.getElementById('cartItems');
-  const checkoutTotal = document.getElementById('checkoutTotal');
-  const promoInput = document.getElementById('promoInput');
-  const promoBtn = document.getElementById('promoBtn');
-  const promoMsg = document.getElementById('promoMsg');
-  const mainContent = document.getElementById('mainContent');
-  const filters = document.getElementById('filters');
-  const searchInput = document.getElementById('searchInput');
-  const priceFilter = document.getElementById('priceFilter');
+        <h3>Shorts</h3>
+        <div class="products-row" id="turkey-shorts">
+          <div class="product-card" onclick="showProductInfo('Galatasaray Home Shorts', 25, 'https://upload.wikimedia.org/wikipedia/en/thumb/9/91/Galatasaray_S.K._logo.svg/1200px-Galatasaray_S.K._logo.svg.png', 'Official Galatasaray 2023 home shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/Galatasaray_S.K._logo.svg/1200px-Galatasaray_S.K._logo.svg.png" alt="Galatasaray Home Shorts" />
+            <h4>Galatasaray Home Shorts</h4>
+            <p class="product-price">€25</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Fenerbahçe Away Shorts', 24, 'https://upload.wikimedia.org/wikipedia/en/thumb/8/89/Fenerbahce_SK_logo.svg/1200px-Fenerbahce_SK_logo.svg.png', 'Official Fenerbahçe 2023 away shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/89/Fenerbahce_SK_logo.svg/1200px-Fenerbahce_SK_logo.svg.png" alt="Fenerbahçe Away Shorts" />
+            <h4>Fenerbahçe Away Shorts</h4>
+            <p class="product-price">€24</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Beşiktaş Third Shorts', 23, 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Besiktas_JK_logo.svg/1200px-Besiktas_JK_logo.svg.png', 'Beşiktaş 2023 third kit shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Besiktas_JK_logo.svg/1200px-Besiktas_JK_logo.svg.png" alt="Beşiktaş Third Shorts" />
+            <h4>Beşiktaş Third Shorts</h4>
+            <p class="product-price">€23</p>
+          </div>
+        </div>
+      </section>
 
-  // Helper: format price
-  function formatPrice(price) {
-    return `$${price.toFixed(2)}`;
-  }
+      <!-- England Section -->
+      <section class="country-section" data-country="england" data-flag="https://flagcdn.com/w320/gb-eng.png">
+        <h2>England</h2>
+        <h3>Jerseys</h3>
+        <div class="products-row" id="england-jerseys">
+          <div class="product-card" onclick="showProductInfo('Manchester United Home Jersey', 60, 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', 'Official Manchester United 2023 home jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Manchester United Home Jersey" />
+            <h4>Manchester United Home Jersey</h4>
+            <p class="product-price">€60</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Chelsea Away Jersey', 58, 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg', 'Official Chelsea 2023 away jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="Chelsea Away Jersey" />
+            <h4>Chelsea Away Jersey</h4>
+            <p class="product-price">€58</p>
+          </div>
+        </div>
 
-  // Show / hide sidebar
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    container.classList.toggle('sidebar-open');
-  });
+        <h3>Shorts</h3>
+        <div class="products-row" id="england-shorts">
+          <div class="product-card" onclick="showProductInfo('Manchester United Home Shorts', 28, 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', 'Official Manchester United 2023 home shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Manchester United Home Shorts" />
+            <h4>Manchester United Home Shorts</h4>
+            <p class="product-price">€28</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Chelsea Away Shorts', 27, 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg', 'Official Chelsea 2023 away shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="Chelsea Away Shorts" />
+            <h4>Chelsea Away Shorts</h4>
+            <p class="product-price">€27</p>
+          </div>
+        </div>
+      </section>
 
-  // Close cart on main area click
-  mainContent.addEventListener('click', () => {
-    if (cartOverlay.classList.contains('visible')) {
-      toggleCart(false);
-    }
-  });
+      <!-- Spain Section -->
+      <section class="country-section" data-country="spain" data-flag="https://flagcdn.com/w320/es.png">
+        <h2>Spain</h2>
+        <h3>Jerseys</h3>
+        <div class="products-row" id="spain-jerseys">
+          <div class="product-card" onclick="showProductInfo('FC Barcelona Home Jersey', 65, 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg', 'Official FC Barcelona 2023 home jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" alt="FC Barcelona Home Jersey" />
+            <h4>FC Barcelona Home Jersey</h4>
+            <p class="product-price">€65</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Real Madrid Away Jersey', 63, 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', 'Official Real Madrid 2023 away jersey.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" alt="Real Madrid Away Jersey" />
+            <h4>Real Madrid Away Jersey</h4>
+            <p class="product-price">€63</p>
+          </div>
+        </div>
 
-  // Toggle cart visibility
-  function toggleCart(show) {
-    if (show) {
-      cartOverlay.classList.add('visible');
-      cartToggle.classList.add('hidden');
-      cartOverlay.setAttribute('aria-hidden', 'false');
-    } else {
-      cartOverlay.classList.remove('visible');
-      cartToggle.classList.remove('hidden');
-      cartOverlay.setAttribute('aria-hidden', 'true');
-    }
-  }
-  cartToggle.addEventListener('click', () => toggleCart(true));
-  cartCloseBtn.addEventListener('click', () => toggleCart(false));
+        <h3>Shorts</h3>
+        <div class="products-row" id="spain-shorts">
+          <div class="product-card" onclick="showProductInfo('FC Barcelona Home Shorts', 30, 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg', 'Official FC Barcelona 2023 home shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" alt="FC Barcelona Home Shorts" />
+            <h4>FC Barcelona Home Shorts</h4>
+            <p class="product-price">€30</p>
+          </div>
+          <div class="product-card" onclick="showProductInfo('Real Madrid Away Shorts', 29, 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', 'Official Real Madrid 2023 away shorts.')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" alt="Real Madrid Away Shorts" />
+            <h4>Real Madrid Away Shorts</h4>
+            <p class="product-price">€29</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </div>
 
-  // Handle category clicks (Virtual, Physical)
-  document.getElementById('catVirtual').addEventListener('click', () => {
-    currentCategory = 'virtual';
-    currentSubcategory = null;
-    currentSubsubcategory = null;
-    filters.hidden = false;
-    setActiveCategory('catVirtual');
-    showSubcats('virtualSubcats');
-    hideSubcats('physicalSubcats');
-    hideSubsubcats();
-    renderProducts();
-  });
+  <!-- Modal -->
+  <div id="productModal" onclick="if(event.target==this)closeModal()">
+    <div class="modal-content">
+      <button class="close-btn" aria-label="Close modal" onclick="closeModal()">×</button>
+      <img id="modal-image" src="" alt="" />
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-price" id="modal-price"></p>
+      <p class="modal-desc" id="modal-desc"></p>
+      <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
+    </div>
+  </div>
 
-  document.getElementById('catPhysical').addEventListener('click', () => {
-    currentCategory = 'physical';
-    currentSubcategory = null;
-    currentSubsubcategory = null;
-    filters.hidden = true;
-    setActiveCategory('catPhysical');
-    showSubcats('physicalSubcats');
-    hideSubcats('virtualSubcats');
-    hideSubsubcats();
-    renderProducts();
-  });
+  <button id="cart-button" title="View Cart" onclick="alert('Cart feature coming soon!')">🛒 Cart</button>
 
-  // Subcategory buttons for virtual (Fortnite, V-Bucks)
-  document.querySelectorAll('#virtualSubcats .subcat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentSubcategory = btn.dataset.subcat;
-      currentSubsubcategory = null;
-      setActiveSubcat(btn);
-      renderProducts();
-    });
-  });
+  <script>
+    let currentProduct = null;
 
-  // Subcategory buttons for physical (Football, Clothing)
-  document.querySelectorAll('#physicalSubcats .subcat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentSubcategory = btn.dataset.subcat;
-      currentSubsubcategory = null;
-      setActiveSubcat(btn);
-      // Show subsubcats based on subcategory
-      if (currentSubcategory === 'football') {
-        showSubsubcats('footballSubsubcats');
-        hideSubsubcats('clothingSubsubcats');
-      } else if (currentSubcategory === 'clothing') {
-        showSubsubcats('clothingSubsubcats');
-        hideSubsubcats('footballSubsubcats');
-      } else {
-        hideSubsubcats();
-      }
-      renderProducts();
-    });
-  });
-
-  // Subsubcategory buttons for football
-  document.querySelectorAll('#footballSubsubcats .subsubcat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentSubsubcategory = btn.dataset.subsubcat;
-      setActiveSubsubcat(btn);
-      renderProducts();
-    });
-  });
-
-  // Subsubcategory buttons for clothing
-  document.querySelectorAll('#clothingSubsubcats .subsubcat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentSubsubcategory = btn.dataset.subsubcat;
-      setActiveSubsubcat(btn);
-      renderProducts();
-    });
-  });
-
-  // Set active classes for categories and subcats
-  function setActiveCategory(id) {
-    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  function setActiveSubcat(btn) {
-    btn.parentElement.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function setActiveSubsubcat(btn) {
-    btn.parentElement.querySelectorAll('.subsubcat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  // Show/hide subcategory containers
-  function showSubcats(id) {
-    document.getElementById(id).style.display = 'flex';
-  }
-  function hideSubcats(id) {
-    if (id) {
-      document.getElementById(id).style.display = 'none';
-    }
-  }
-
-  // Show/hide subsubcategory containers
-  function showSubsubcats(id) {
-    document.getElementById(id).style.display = 'flex';
-  }
-  function hideSubsubcats(exceptId) {
-    ['footballSubsubcats', 'clothingSubsubcats'].forEach(id => {
-      if (id !== exceptId) {
-        document.getElementById(id).style.display = 'none';
-      }
-    });
-  }
-
-  // Render products based on current selections and filters
-  function renderProducts() {
-    mainContent.innerHTML = ''; // Clear products display
-
-    let productsList = [];
-
-    if (!currentCategory) {
-      mainContent.innerHTML = `<div class="intro-text">
-        <h2>Welcome to Our Shop!</h2>
-        <p>Browse through virtual and physical products. Use the categories on the left to get started.</p>
-        <p>Add items to your cart and proceed to checkout. Use promo codes for discounts!</p>
-      </div>`;
-      return;
+    // Show product modal info
+    function showProductInfo(name, price, imageUrl, desc) {
+      currentProduct = { name, price, imageUrl, desc };
+      document.getElementById('modal-title').textContent = name;
+      document.getElementById('modal-price').textContent = `€${price}`;
+      document.getElementById('modal-image').src = imageUrl;
+      document.getElementById('modal-image').alt = name;
+      document.getElementById('modal-desc').textContent = desc;
+      document.getElementById('productModal').style.display = 'flex';
     }
 
-    // Fetch products based on category and subcategories
-    if (currentCategory === 'virtual') {
-      if (currentSubcategory) {
-        productsList = productsData.virtual[currentSubcategory] || [];
-      } else {
-        // If no subcategory selected, show all virtual products
-        productsList = Object.values(productsData.virtual).flat();
-      }
-    } else if (currentCategory === 'physical') {
-      if (currentSubcategory) {
-        if (currentSubsubcategory) {
-          productsList = productsData.physical[currentSubcategory][currentSubsubcategory] || [];
-        } else {
-          // If no subsubcategory, show all subsubcategory products in the subcategory
-          productsList = Object.values(productsData.physical[currentSubcategory]).flat();
+    // Close modal
+    function closeModal() {
+      document.getElementById('productModal').style.display = 'none';
+    }
+
+    // Dummy add to cart
+    function addToCart() {
+      alert(`Added "${currentProduct.name}" to cart at €${currentProduct.price}!`);
+      closeModal();
+    }
+
+    // Background flags for countries
+    const countrySections = document.querySelectorAll('.country-section');
+    function updateBackground(flagUrl) {
+      document.body.style.backgroundImage = `url('${flagUrl}')`;
+    }
+
+    // Scroll detection for footballShop
+    const footballShop = document.getElementById('footballShop');
+    window.addEventListener('scroll', () => {
+      // Get scroll position of footballShop relative to viewport top
+      const scrollTop = window.scrollY;
+      let activeCountry = null;
+      let minDistance = Infinity;
+
+      countrySections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        // distance from viewport top to section top
+        const distance = Math.abs(rect.top);
+        if (distance < minDistance) {
+          minDistance = distance;
+          activeCountry = section;
         }
-      } else {
-        // No subcategory selected, show all physical products
-        productsList = Object.values(productsData.physical).flatMap(subcat => Object.values(subcat).flat());
-      }
-    }
-
-    // Filter by search term
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    if (searchTerm) {
-      productsList = productsList.filter(p => p.name.toLowerCase().includes(searchTerm));
-    }
-
-    // Filter by price
-    const maxPrice = parseFloat(priceFilter.value);
-    if (!isNaN(maxPrice)) {
-      productsList = productsList.filter(p => p.price <= maxPrice);
-    }
-
-    if (productsList.length === 0) {
-      mainContent.innerHTML = '<p>No products found matching your criteria.</p>';
-      return;
-    }
-
-    // Create product cards
-    productsList.forEach(product => {
-      const productCard = document.createElement('div');
-      productCard.className = 'product-card';
-
-      productCard.innerHTML = `
-        <img src="${product.image}" alt="${product.name}">
-        <h3>${product.name}</h3>
-        <p class="price">${formatPrice(product.price)}</p>
-        <button aria-label="Add ${product.name} to cart" data-id="${product.id}">Add to Cart</button>
-      `;
-
-      productCard.querySelector('button').addEventListener('click', () => {
-        addToCart(product);
       });
 
-      mainContent.appendChild(productCard);
-    });
-  }
-
-  // Add product to cart
-  function addToCart(product) {
-    if (cart[product.id]) {
-      cart[product.id].quantity += 1;
-    } else {
-      cart[product.id] = { ...product, quantity: 1 };
-    }
-    updateCart();
-  }
-
-  // Remove product from cart
-  function removeFromCart(productId) {
-    delete cart[productId];
-    updateCart();
-  }
-
-  // Update cart display and total
-  function updateCart() {
-    cartItemsEl.innerHTML = '';
-
-    let total = 0;
-
-    Object.values(cart).forEach(item => {
-      total += item.price * item.quantity;
-      const cartItem = document.createElement('li');
-      cartItem.className = 'cart-item';
-      cartItem.innerHTML = `
-        <span>${item.name} (x${item.quantity})</span>
-        <span>${formatPrice(item.price * item.quantity)}</span>
-        <button aria-label="Remove ${item.name} from cart" data-id="${item.id}">Remove</button>
-      `;
-      cartItem.querySelector('button').addEventListener('click', () => {
-        removeFromCart(item.id);
-      });
-      cartItemsEl.appendChild(cartItem);
-    });
-
-    // Apply discount if promo used
-    if (promoUsed && !discountApplied) {
-      total *= 0.9; // 10% discount
-      discountApplied = true;
-      promoMsg.textContent = 'Promo code applied! 10% discount on your total.';
-      promoMsg.style.color = 'green';
-    }
-
-    checkoutTotal.textContent = `Total: ${formatPrice(total)}`;
-
-    if (Object.keys(cart).length === 0) {
-      promoMsg.textContent = '';
-      discountApplied = false;
-      promoUsed = false;
-      checkoutTotal.textContent = 'Total: $0.00';
-    }
-  }
-
-  // Promo code logic
-  promoBtn.addEventListener('click', () => {
-    const code = promoInput.value.trim().toLowerCase();
-    if (code === 'discount10') {
-      if (promoUsed) {
-        promoMsg.textContent = 'Promo code already used.';
-        promoMsg.style.color = 'red';
-      } else {
-        promoUsed = true;
-        discountApplied = false;
-        updateCart();
+      if (activeCountry) {
+        const flagUrl = activeCountry.getAttribute('data-flag');
+        updateBackground(flagUrl);
       }
-    } else {
-      promoMsg.textContent = 'Invalid promo code.';
-      promoMsg.style.color = 'red';
-    }
-  });
+    });
 
-  // Search and filter events
-  searchInput.addEventListener('input', renderProducts);
-  priceFilter.addEventListener('input', renderProducts);
-
-  // Initial render
-  renderProducts();
-</script>  
+    // On page load, set background to first country's flag
+    window.addEventListener('load', () => {
+      if (countrySections.length > 0) {
+        updateBackground(countrySections[0].getAttribute('data-flag'));
+      }
+    });
+  </script>
 </body>
 </html>
