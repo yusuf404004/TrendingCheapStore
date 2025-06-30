@@ -164,6 +164,7 @@
       transition: transform 0.4s ease;
       z-index: 1200;
       user-select: none;
+      outline: none;
     }
     #cartSidebar.open {
       transform: translateX(0);
@@ -212,6 +213,7 @@
       transition: background 0.3s ease;
       min-width: 45px;
       text-align: center;
+      margin: 0 4px;
     }
     .cart-item-qty-btn:hover {
       background: #219150;
@@ -231,6 +233,7 @@
       user-select: none;
       padding: 0 6px;
       transition: color 0.2s ease;
+      margin-left: 8px;
     }
     .cart-item-remove-btn:hover {
       color: #c0392b;
@@ -255,6 +258,7 @@
       cursor: pointer;
       user-select: none;
       transition: background 0.3s ease;
+      width: 100%;
     }
     #checkoutBtn {
       background: #3498db;
@@ -297,59 +301,57 @@
     }
     #extraContent h2 {
       margin-top: 0;
+      color: #222;
       font-weight: 700;
-      color: #27ae60;
-      margin-bottom: 15px;
-    }
-    #extraContent p {
-      margin-bottom: 15px;
-      font-size: 1.1rem;
+      font-size: 2rem;
     }
 
-    /* Promo code area */
-    #promoCodeSection {
+    /* Promo code section */
+    #promoSection {
       margin-top: 40px;
       max-width: 1000px;
       background: #fff;
-      padding: 20px 30px;
+      padding: 25px 30px;
       border-radius: 12px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.08);
       display: flex;
+      gap: 12px;
       align-items: center;
-      gap: 15px;
       user-select: none;
     }
-    #promoCodeSection input[type="text"] {
+    #promoSection input[type="text"] {
       flex-grow: 1;
       padding: 12px 15px;
       font-size: 1.1rem;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      outline-offset: 2px;
+      border-radius: 10px;
+      border: 2px solid #ddd;
       transition: border-color 0.3s ease;
     }
-    #promoCodeSection input[type="text"]:focus {
+    #promoSection input[type="text"]:focus {
+      outline: none;
       border-color: #27ae60;
+      box-shadow: 0 0 6px #27ae60aa;
     }
-    #promoCodeSection button {
+    #applyPromoBtn {
       background: #27ae60;
       border: none;
-      color: white;
-      padding: 12px 25px;
-      font-size: 1.1rem;
+      padding: 14px 22px;
       font-weight: 700;
-      border-radius: 8px;
+      font-size: 1.1rem;
+      color: white;
+      border-radius: 10px;
       cursor: pointer;
       transition: background 0.3s ease;
       user-select: none;
     }
-    #promoCodeSection button:hover {
+    #applyPromoBtn:hover {
       background: #219150;
     }
+
     #promoMessage {
-      margin-left: 15px;
+      margin-left: 20px;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
     #promoMessage.success {
       color: #27ae60;
@@ -359,13 +361,21 @@
     }
 
     /* Responsive */
-    @media (max-width: 420px) {
-      #promoCodeSection {
+    @media (max-width: 480px) {
+      #cartSidebar {
+        width: 100vw;
+      }
+      #extraContent, #promoSection, #products {
+        padding: 15px;
+      }
+      #promoSection {
         flex-direction: column;
-        gap: 10px;
+        align-items: stretch;
       }
       #promoMessage {
         margin-left: 0;
+        margin-top: 10px;
+        text-align: center;
       }
     }
   </style>
@@ -374,125 +384,138 @@
 
   <h1>Trending Cheap Store</h1>
 
-  <div id="products" aria-live="polite" aria-label="Product List">
-    <div class="product" tabindex="0" role="button" aria-pressed="false">
-      <img src="https://via.placeholder.com/240x160?text=Wireless+Earbuds" alt="Wireless Earbuds" />
-      <div class="product-info">
-        <h3>Wireless Earbuds</h3>
-        <p>$29.99</p>
-        <button aria-label="Add Wireless Earbuds to cart" onclick="addToCart('Wireless Earbuds', 29.99)">Add to Cart</button>
-      </div>
-    </div>
+  <main id="products" aria-label="Product List">
+    <!-- Products will be added by JavaScript -->
+  </main>
 
-    <div class="product" tabindex="0" role="button" aria-pressed="false">
-      <img src="https://via.placeholder.com/240x160?text=Smart+Watch" alt="Smart Watch" />
-      <div class="product-info">
-        <h3>Smart Watch</h3>
-        <p>$49.99</p>
-        <button aria-label="Add Smart Watch to cart" onclick="addToCart('Smart Watch', 49.99)">Add to Cart</button>
-      </div>
-    </div>
+  <button id="cartToggleBtn" aria-label="Open shopping cart" aria-expanded="false">
+    🛒<span id="cartCount" aria-live="polite" aria-atomic="true">0</span>
+  </button>
 
-    <div class="product" tabindex="0" role="button" aria-pressed="false">
-      <img src="https://via.placeholder.com/240x160?text=Bluetooth+Speaker" alt="Bluetooth Speaker" />
-      <div class="product-info">
-        <h3>Bluetooth Speaker</h3>
-        <p>$39.99</p>
-        <button aria-label="Add Bluetooth Speaker to cart" onclick="addToCart('Bluetooth Speaker', 39.99)">Add to Cart</button>
-      </div>
-    </div>
-  </div>
+  <aside id="cartSidebar" aria-hidden="true" tabindex="-1" role="region" aria-label="Shopping cart sidebar">
+    <h2>Your Cart</h2>
+    <div id="cartItems" tabindex="0" aria-live="polite" aria-relevant="additions removals"></div>
+    <div id="cartTotal" aria-live="polite">Total: $0.00</div>
+    <button id="checkoutBtn" aria-label="Checkout">Checkout</button>
+    <button id="closeCartBtn" aria-label="Close cart">Close</button>
+  </aside>
 
-  <!-- Extra content below store to make page longer -->
-  <section id="extraContent" aria-label="More Deals and Info">
-    <h2>More Deals & Info</h2>
-    <p>Discover even more amazing products and exclusive discounts coming soon! Stay tuned for flash sales, bundle offers, and limited-time promotions.</p>
-    <p>Our team handpicks trending tech gadgets, cool accessories, and smart home devices just for you.</p>
-    <p>Sign up to our newsletter to never miss out on the hottest deals!</p>
-  </section>
-
-  <!-- Promo Code Section -->
-  <section id="promoCodeSection" aria-label="Promo Code">
-    <input type="text" id="promoCodeInput" placeholder="Enter promo code" aria-label="Enter promo code" />
-    <button id="applyPromoBtn" aria-label="Apply promo code">Submit</button>
+  <section id="promoSection" aria-label="Promo code section">
+    <input type="text" id="promoCodeInput" placeholder="Enter promo code" aria-label="Promo code input" autocomplete="off" />
+    <button id="applyPromoBtn" aria-label="Apply promo code">Apply</button>
     <div id="promoMessage" role="alert" aria-live="assertive"></div>
   </section>
 
-  <button id="cartToggleBtn" aria-label="Toggle Shopping Cart" aria-haspopup="true" aria-expanded="false">
-    🛒
-    <span id="cartCount" aria-live="polite" aria-atomic="true">0</span>
-  </button>
-
-  <aside id="cartSidebar" aria-label="Shopping Cart" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-    <h2>Your Cart</h2>
-    <div id="cartItems"></div>
-    <div id="cartTotal">Total: $0.00</div>
-    <button id="checkoutBtn">Checkout</button>
-    <button id="closeCartBtn">Close</button>
-  </aside>
+  <section id="extraContent" aria-label="Extra store content">
+    <h2>Welcome to Trending Cheap Store!</h2>
+    <p>
+      Discover the best deals on trending products handpicked just for you.
+      Our store offers quality items at unbeatable prices. Browse through the
+      latest gadgets, fashion, and more.
+    </p>
+    <p>
+      Enjoy smooth shopping with our easy-to-use cart and exclusive promo codes.
+      Don’t miss out on limited-time offers and daily discounts. Stay tuned for
+      new arrivals and seasonal sales.
+    </p>
+    <p>
+      Need help? Contact our friendly support team anytime or check out our FAQs.
+      We’re here to make your shopping experience effortless and enjoyable.
+    </p>
+  </section>
 
   <script>
+    // Sample products data
+    const productsData = [
+      { id: 'prod1', name: 'Wireless Earbuds', price: 39.99, img: 'https://via.placeholder.com/300x160?text=Earbuds' },
+      { id: 'prod2', name: 'Smartwatch', price: 79.99, img: 'https://via.placeholder.com/300x160?text=Smartwatch' },
+      { id: 'prod3', name: 'Bluetooth Speaker', price: 49.99, img: 'https://via.placeholder.com/300x160?text=Speaker' },
+      { id: 'prod4', name: 'Fitness Tracker', price: 59.99, img: 'https://via.placeholder.com/300x160?text=Tracker' },
+      { id: 'prod5', name: 'Portable Charger', price: 29.99, img: 'https://via.placeholder.com/300x160?text=Charger' },
+      { id: 'prod6', name: 'HD Webcam', price: 69.99, img: 'https://via.placeholder.com/300x160?text=Webcam' }
+    ];
+
+    // Cart state
+    let cart = {};
+    let discountApplied = false;
+    const promoCodeValid = 'RELEASE';
+    const promoUsedKey = 'promoUsed';
+    let promoUsed = localStorage.getItem(promoUsedKey) === 'true';
+
+    // DOM Elements
+    const productsContainer = document.getElementById('products');
     const cartToggleBtn = document.getElementById('cartToggleBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const cartItemsContainer = document.getElementById('cartItems');
-    const cartCount = document.getElementById('cartCount');
     const cartTotal = document.getElementById('cartTotal');
+    const checkoutBtn = document.getElementById('checkoutBtn');
     const closeCartBtn = document.getElementById('closeCartBtn');
+    const cartCount = document.getElementById('cartCount');
     const promoCodeInput = document.getElementById('promoCodeInput');
     const applyPromoBtn = document.getElementById('applyPromoBtn');
     const promoMessage = document.getElementById('promoMessage');
 
-    let cart = {};
-    let discountApplied = false;
+    // Render products
+    function renderProducts() {
+      productsContainer.innerHTML = '';
+      productsData.forEach(({ id, name, price, img }) => {
+        const product = document.createElement('article');
+        product.className = 'product';
+        product.setAttribute('tabindex', '0');
+        product.setAttribute('aria-label', `${name}, Price $${price.toFixed(2)}`);
 
-    // Load promo usage from localStorage (single use per visitor)
-    const promoUsedKey = 'promo_release_used';
-    const promoCodeValid = 'RELEASE';
-    let promoUsed = localStorage.getItem(promoUsedKey) === 'true';
+        product.innerHTML = `
+          <img src="${img}" alt="${name} image" />
+          <div class="product-info">
+            <h3>${name}</h3>
+            <p>$${price.toFixed(2)}</p>
+            <button aria-label="Add ${name} to cart" data-id="${id}">Add to Cart</button>
+          </div>
+        `;
+        productsContainer.appendChild(product);
+      });
+    }
 
+    // Add product to cart
+    function addToCart(id) {
+      const product = productsData.find(p => p.id === id);
+      if (!product) return;
+      if (cart[id]) {
+        cart[id].qty++;
+      } else {
+        cart[id] = { ...product, qty: 1 };
+      }
+      renderCart();
+    }
+
+    // Update cart count badge
     function updateCartCount() {
-      const totalQty = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+      const totalQty = Object.values(cart).reduce((acc, item) => acc + item.qty, 0);
       cartCount.textContent = totalQty;
-      cartToggleBtn.setAttribute('aria-label', `Shopping cart with ${totalQty} items`);
       if (totalQty === 0) {
         cartCount.style.display = 'none';
-        discountApplied = false;  // reset discount if cart empty
-        promoUsed = false;
-        localStorage.removeItem(promoUsedKey);
-        promoMessage.textContent = '';
-        promoCodeInput.disabled = false;
-        applyPromoBtn.disabled = false;
       } else {
         cartCount.style.display = 'flex';
       }
     }
 
-    function calculateTotal() {
-      let total = 0;
-      for (const key in cart) {
-        total += cart[key].price * cart[key].qty;
-      }
-      return total;
-    }
-
+    // Update total with discount
     function updateCartTotal() {
-      let total = calculateTotal();
+      let total = Object.values(cart).reduce((acc, item) => acc + item.price * item.qty, 0);
       if (discountApplied) {
         const discountAmount = total * 0.15;
-        const discountedTotal = total - discountAmount;
-        cartTotal.innerHTML = `
-          Total: <s>$${total.toFixed(2)}</s> 
-          <strong style="color:#27ae60;">$${discountedTotal.toFixed(2)} (-15%)</strong>
-        `;
+        total = total - discountAmount;
+        cartTotal.innerHTML = `<strong>Total after 15% discount: $${total.toFixed(2)}</strong>`;
       } else {
         cartTotal.textContent = `Total: $${total.toFixed(2)}`;
       }
     }
 
+    // Render cart items in sidebar
     function renderCart() {
       cartItemsContainer.innerHTML = '';
-      for (const key in cart) {
-        const item = cart[key];
+      for (const id in cart) {
+        const item = cart[id];
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.setAttribute('role', 'group');
@@ -500,11 +523,20 @@
 
         div.innerHTML = `
           <div class="cart-item-name">${item.name}</div>
-          <button aria-label="Decrease quantity of ${item.name}" class="cart-item-qty-btn" data-action="decrease" data-key="${key}">−</button>
-          <span aria-live="polite" aria-atomic="true">${item.qty}</span>
-          <button aria-label="Increase quantity of ${item.name}" class="cart-item-qty-btn" data-action="increase" data-key="${key}">+</button>
+          <button aria-label="Decrease quantity of ${item.name}" class="cart-item-qty-btn" data-action="decrease" data-id="${id}">−</button>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            value="${item.qty}"
+            aria-label="Quantity of ${item.name}"
+            class="cart-item-qty-input"
+            data-id="${id}"
+            style="width: 55px; padding: 4px; border-radius: 6px; border: 1px solid #ccc; text-align: center;"
+          />
+          <button aria-label="Increase quantity of ${item.name}" class="cart-item-qty-btn" data-action="increase" data-id="${id}">+</button>
           <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
-          <button aria-label="Remove ${item.name} from cart" class="cart-item-remove-btn" data-key="${key}">&times;</button>
+          <button aria-label="Remove ${item.name} from cart" class="cart-item-remove-btn" data-id="${id}">&times;</button>
         `;
         cartItemsContainer.appendChild(div);
       }
@@ -512,41 +544,50 @@
       updateCartTotal();
     }
 
-    function addToCart(name, price) {
-      if (cart[name]) {
-        cart[name].qty++;
-      } else {
-        cart[name] = { name, price, qty: 1 };
-      }
-      renderCart();
-    }
-
-    // Handle cart buttons (increase, decrease, remove)
+    // Event delegation for cart item buttons
     cartItemsContainer.addEventListener('click', (e) => {
       const target = e.target;
       if (target.classList.contains('cart-item-qty-btn')) {
-        const key = target.dataset.key;
-        if (!key) return;
+        const id = target.dataset.id;
+        if (!id) return;
         if (target.dataset.action === 'increase') {
-          cart[key].qty++;
+          cart[id].qty++;
         } else if (target.dataset.action === 'decrease') {
-          if (cart[key].qty > 1) {
-            cart[key].qty--;
+          if (cart[id].qty > 1) {
+            cart[id].qty--;
           } else {
-            delete cart[key];
+            delete cart[id];
           }
         }
         renderCart();
       }
       if (target.classList.contains('cart-item-remove-btn')) {
-        const key = target.dataset.key;
-        if (key) {
-          delete cart[key];
+        const id = target.dataset.id;
+        if (id) {
+          delete cart[id];
           renderCart();
         }
       }
     });
 
+    // Listen for manual quantity input changes
+    cartItemsContainer.addEventListener('input', (e) => {
+      if (e.target.classList.contains('cart-item-qty-input')) {
+        const input = e.target;
+        const id = input.dataset.id;
+        if (!id) return;
+        let val = parseInt(input.value);
+        if (isNaN(val) || val < 1) val = 1;
+        if (val > 100) val = 100;
+        input.value = val;
+        if (cart[id]) {
+          cart[id].qty = val;
+          renderCart();
+        }
+      }
+    });
+
+    // Cart toggle button open/close
     cartToggleBtn.addEventListener('click', () => {
       const expanded = cartToggleBtn.getAttribute('aria-expanded') === 'true';
       if (!expanded) {
@@ -554,18 +595,25 @@
         cartSidebar.setAttribute('aria-hidden', 'false');
         cartSidebar.focus();
         cartToggleBtn.setAttribute('aria-expanded', 'true');
-      } else {
-        cartSidebar.classList.remove('open');
-        cartSidebar.setAttribute('aria-hidden', 'true');
-        cartToggleBtn.setAttribute('aria-expanded', 'false');
+        // Hide cart button when sidebar open
+        cartToggleBtn.style.display = 'none';
       }
     });
 
+    // Close cart sidebar button
     closeCartBtn.addEventListener('click', () => {
       cartSidebar.classList.remove('open');
       cartSidebar.setAttribute('aria-hidden', 'true');
       cartToggleBtn.setAttribute('aria-expanded', 'false');
+      cartToggleBtn.style.display = 'flex';
       cartToggleBtn.focus();
+    });
+
+    // Add to cart button clicks (event delegation)
+    productsContainer.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON' && e.target.dataset.id) {
+        addToCart(e.target.dataset.id);
+      }
     });
 
     // Promo code logic
@@ -598,16 +646,16 @@
 
     applyPromoBtn.addEventListener('click', applyPromoCode);
 
-    // Optional: allow pressing Enter in promo input
-    promoCodeInput.addEventListener('keydown', (e) => {
+    promoCodeInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         applyPromoCode();
       }
     });
 
     // Initialize
+    renderProducts();
     renderCart();
-  </script>
 
+  </script>
 </body>
 </html>
