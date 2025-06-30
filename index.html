@@ -5,375 +5,386 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TrendingCheapStore</title>
 <style>
-  /* Reset & base */
+  /* Reset and base styles */
   * {
     box-sizing: border-box;
   }
   body, html {
-    margin:0; padding:0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fa;
-    overflow-x: hidden;
-  }
-  button {
-    cursor: pointer;
+    margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #222;
+    height: 100vh; overflow-x: hidden;
   }
 
   /* Layout */
-  #app {
+  #container {
     display: flex;
-    min-height: 100vh;
-  }
-
-  /* Sidebar */
-  #sidebar {
-    position: fixed;
-    top: 0; left: 0;
-    width: 260px;
     height: 100vh;
-    background: #222d42;
+    overflow: hidden;
+  }
+  #sidebar {
+    background: #222;
     color: white;
-    padding: 1rem 0;
-    transform: translateX(-280px);
-    transition: transform 0.3s ease;
+    width: 260px;
+    position: fixed;
+    top: 0; left: -260px;
+    height: 100vh;
+    padding: 20px;
     overflow-y: auto;
-    z-index: 1100;
+    transition: left 0.3s ease;
+    z-index: 10;
   }
   #sidebar.open {
-    transform: translateX(0);
+    left: 0;
   }
   #sidebar h2 {
-    font-weight: 700;
-    font-size: 1.3rem;
-    margin: 0 1.5rem 1rem;
-    user-select: none;
+    margin-top: 0;
   }
-  #sidebar section {
-    margin-bottom: 1rem;
-  }
-  #sidebar button.category-btn,
+  #sidebar button.category-btn, 
   #sidebar button.subcat-btn,
   #sidebar button.subsubcat-btn {
-    display: block;
-    width: 90%;
-    margin: 0.3rem auto;
-    padding: 0.5rem 0.75rem;
-    background: transparent;
-    border: none;
-    color: #cfd8dc;
-    font-size: 0.9rem;
+    width: 100%;
     text-align: left;
+    background: #333;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px 0;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: background 0.2s;
   }
   #sidebar button.category-btn:hover,
   #sidebar button.subcat-btn:hover,
   #sidebar button.subsubcat-btn:hover {
-    background-color: #455a75;
-    color: white;
+    background: #555;
   }
   #sidebar button.active {
-    background-color: #1a73e8;
-    color: white;
-    font-weight: 700;
+    background: #0a84ff;
+  }
+  #sidebar .subcat-container,
+  #sidebar .subsubcat-container {
+    margin-left: 12px;
+    margin-top: 5px;
+  }
+  #sidebar .subcat-container, #sidebar .subsubcat-container {
+    display: none;
+  }
+  #sidebar .subcat-container.open,
+  #sidebar .subsubcat-container.open {
+    display: block;
   }
 
-  /* Sidebar toggle button top left */
-  #sidebarToggle {
+  /* Toggle menu button */
+  #menuToggle {
     position: fixed;
-    top: 10px; left: 10px;
-    width: 35px; height: 35px;
-    background: #1a73e8;
+    top: 15px;
+    left: 15px;
+    background: #0a84ff;
     border: none;
-    border-radius: 5px;
     color: white;
-    font-weight: 700;
-    font-size: 22px;
-    z-index: 1200;
-    user-select: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 20;
   }
 
-  /* Main Content */
+  /* Main content area */
   #mainContent {
+    flex-grow: 1;
     margin-left: 0;
-    padding: 1rem 1rem 3rem 1rem;
-    flex: 1;
+    padding: 20px;
     transition: margin-left 0.3s ease;
+    overflow-y: auto;
+    height: 100vh;
   }
-  #sidebar.open ~ #mainContent {
+  #container.sidebar-open #mainContent {
     margin-left: 260px;
   }
 
-  /* Header with Cart button */
-  #header {
+  /* Explanation on front page */
+  #explanation {
+    max-width: 900px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+  #explanation h1 {
+    margin-top: 0;
+    color: #0a84ff;
+  }
+  #explanation ul {
+    margin-left: 20px;
+  }
+
+  /* Filters for Virtual */
+  #filters {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 1rem;
-    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    gap: 10px;
   }
-  #cartToggle {
-    background: #1a73e8;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 5px;
-    color: white;
-    font-weight: 700;
-    user-select: none;
-    transition: background-color 0.3s ease;
-  }
-  #cartToggle.hidden {
-    display: none;
-  }
-  #cartToggle:hover {
-    background: #155ab6;
+  #filters input[type="search"],
+  #filters select {
+    padding: 7px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    flex: 1 1 200px;
   }
 
   /* Products grid */
   #products {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    gap: 25px;
+    max-width: 900px;
+    margin: 0 auto 50px;
   }
   .product-item {
     background: white;
-    border-radius: 6px;
-    padding: 0.8rem;
+    border-radius: 8px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: box-shadow 0.25s ease;
+    user-select: none;
+    transition: box-shadow 0.2s ease;
   }
   .product-item:hover {
-    box-shadow: 0 6px 12px rgb(0 0 0 / 0.15);
+    box-shadow: 0 6px 15px rgb(0 0 0 / 0.15);
   }
   .product-item img {
     max-width: 100%;
-    height: 140px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     object-fit: contain;
+    height: 150px;
   }
   .product-name {
-    margin-top: 0.6rem;
-    font-weight: 600;
-    text-align: center;
-    font-size: 1rem;
+    font-weight: bold;
+    padding: 12px 15px 5px;
+    font-size: 16px;
+    flex-grow: 1;
   }
   .price {
-    margin-top: 0.3rem;
-    color: #388e3c;
-    font-weight: 700;
-    font-size: 1.1rem;
+    padding: 0 15px 15px;
+    font-size: 15px;
+    color: #0a84ff;
+    font-weight: 600;
   }
 
-  /* Cart Overlay */
-  #cartOverlay {
+  /* Cart button */
+  #cartToggle {
     position: fixed;
-    top: 60px;
-    right: 10px;
-    width: 350px;
-    max-height: 75vh;
-    background: white;
-    box-shadow: 0 4px 15px rgb(0 0 0 / 0.25);
-    border-radius: 8px;
-    padding: 1rem;
-    overflow-y: auto;
-    z-index: 1200;
+    top: 15px;
+    right: 15px;
+    background: #0a84ff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 20;
+  }
+  #cartToggle.hidden {
     display: none;
   }
-  #cartOverlay.visible {
-    display: block;
+
+  /* Cart overlay */
+  #cartOverlay {
+    position: fixed;
+    top: 0; right: 0;
+    width: 360px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgb(0 0 0 / 0.3);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
   }
-  #cartOverlay h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    text-align: center;
+  #cartOverlay.visible {
+    transform: translateX(0);
+  }
+  #cartHeader {
+    padding: 15px 20px;
+    font-weight: bold;
+    font-size: 18px;
+    background: #0a84ff;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #cartCloseBtn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  /* Cart items */
+  #cartItems {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px 20px;
   }
   .cart-item {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
-    gap: 0.7rem;
+    margin-bottom: 20px;
   }
   .cart-item img {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-right: 12px;
   }
   .cart-item-info {
-    flex: 1;
+    flex-grow: 1;
   }
   .cart-item-name {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: bold;
+    font-size: 15px;
   }
   .cart-item-price {
-    color: #388e3c;
-    font-weight: 700;
-    font-size: 0.9rem;
+    color: #0a84ff;
+    margin-top: 3px;
+    font-size: 14px;
   }
   .cart-quantity {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 5px;
   }
   .qty-btn {
-    width: 22px;
-    height: 22px;
-    background: #1a73e8;
+    background: #0a84ff;
     border: none;
-    border-radius: 4px;
     color: white;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 18px;
-    padding: 0;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
     user-select: none;
-  }
-  .qty-btn:active {
-    background: #155ab6;
+    line-height: 1;
   }
   .qty-input {
     width: 45px;
-    height: 28px;
     text-align: center;
-    border: 1px solid #ccc;
+    font-size: 14px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 1rem;
+    padding: 3px;
   }
 
-  /* Checkout & promo */
-  #checkoutTotal {
-    font-weight: 700;
-    font-size: 1.15rem;
-    text-align: center;
-    margin-top: 1rem;
-    color: #111;
+  /* Cart footer */
+  #cartFooter {
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
   }
-  #promoSection {
-    margin-top: 1.2rem;
+  #checkoutTotal {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #0a84ff;
+  }
+  #promoContainer {
     display: flex;
-    justify-content: center;
-    gap: 0.6rem;
-    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
   }
   #promoInput {
-    width: 65%;
-    padding: 0.4rem 0.6rem;
-    font-size: 1rem;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-  }
-  #promoBtn {
-    background: #388e3c;
-    border: none;
-    color: white;
-    font-weight: 700;
-    padding: 0.4rem 0.9rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    user-select: none;
-  }
-  #promoBtn:hover {
-    background: #2c6e2a;
-  }
-  #promoMsg {
-    text-align: center;
-    margin-top: 0.7rem;
-    font-weight: 600;
-  }
-
-  /* Search & filters */
-  #filters {
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  #searchInput {
-    padding: 0.5rem 0.7rem;
-    font-size: 1rem;
-    width: 200px;
+    flex-grow: 1;
+    padding: 8px;
+    font-size: 14px;
     border-radius: 4px;
     border: 1px solid #ccc;
   }
-  #priceFilter {
-    width: 150px;
+  #promoBtn {
+    background: #0a84ff;
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
   }
-  label {
-    font-weight: 600;
-  }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    #products {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    #sidebar.open ~ #mainContent {
-      margin-left: 260px;
-    }
-  }
-  @media (max-width: 600px) {
-    #products {
-      grid-template-columns: 1fr;
-    }
-    #sidebar {
-      width: 220px;
-    }
-    #sidebar.open ~ #mainContent {
-      margin-left: 220px;
-    }
+  #promoMsg {
+    color: #f44336;
+    font-size: 13px;
+    min-height: 18px;
   }
 </style>
 </head>
 <body>
-<button id="sidebarToggle" aria-label="Toggle menu">&#9776;</button>
 
-<div id="sidebar" aria-label="Sidebar navigation menu" role="navigation" aria-hidden="true">
-  <h2>Categories</h2>
-  <section>
-    <button class="category-btn" id="catVirtual" aria-pressed="false">Virtual</button>
-    <div id="virtualSubcats" style="display:none; padding-left: 1rem;">
-      <button class="subcat-btn" data-subcat="fortniteAccounts">Fortnite Accounts</button>
-      <button class="subcat-btn" data-subcat="vBucks">V-Bucks</button>
+<button id="menuToggle" aria-label="Toggle menu">☰ Menu</button>
+<button id="cartToggle" aria-label="Open cart">🛒 Cart (0)</button>
+
+<div id="container">
+  <nav id="sidebar" aria-label="Store Categories">
+    <h2>Categories</h2>
+    <button class="category-btn" id="catVirtual" aria-expanded="false">Virtual</button>
+    <div id="virtualSubcats" class="subcat-container">
+      <button class="subcat-btn" data-subcat="fortnite" aria-expanded="false">Fortnite</button>
+      <button class="subcat-btn" data-subcat="vbucks" aria-expanded="false">V-Bucks (Amounts)</button>
     </div>
-  </section>
-  <section>
-    <button class="category-btn" id="catPhysical" aria-pressed="false">Physical</button>
-    <div id="physicalSubcats" style="display:none; padding-left: 1rem;">
-      <button class="subcat-btn" data-subcat="football">Football</button>
-      <button class="subcat-btn" data-subcat="clothing">Clothing</button>
+
+    <button class="category-btn" id="catPhysical" aria-expanded="false">Physical</button>
+    <div id="physicalSubcats" class="subcat-container">
+      <button class="subcat-btn" data-subcat="football" aria-expanded="false">Football</button>
+      <button class="subcat-btn" data-subcat="clothing" aria-expanded="false">Clothing</button>
     </div>
-    <div id="footballSubsubcats" style="display:none; padding-left: 1.5rem; margin-top: 0.5rem;">
+
+    <div id="footballSubsubcats" class="subsubcat-container">
       <button class="subsubcat-btn" data-subsubcat="jerseys">Jerseys</button>
-      <button class="subsubcat-btn" data-subsubcat="mysteryBoxes">Mystery Boxes</button>
+      <button class="subsubcat-btn" data-subsubcat="mysteryboxes">Mystery Boxes</button>
       <button class="subsubcat-btn" data-subsubcat="sets">Sets</button>
     </div>
-    <div id="clothingSubsubcats" style="display:none; padding-left: 1.5rem; margin-top: 0.5rem;">
+
+    <div id="clothingSubsubcats" class="subsubcat-container">
       <button class="subsubcat-btn" data-subsubcat="socks">Socks</button>
       <button class="subsubcat-btn" data-subsubcat="shirts">Shirts</button>
       <button class="subsubcat-btn" data-subsubcat="tshirts">T-Shirts</button>
       <button class="subsubcat-btn" data-subsubcat="pants">Pants</button>
       <button class="subsubcat-btn" data-subsubcat="shorts">Shorts</button>
-      <button class="subsubcat-btn" data-subsubcat="swimShorts">Swimming Shorts</button>
+      <button class="subsubcat-btn" data-subsubcat="swimmingshorts">Swimming Shorts</button>
     </div>
-  </section>
-</div>
+  </nav>
 
-<div id="app">
-  <main id="mainContent" tabindex="-1" aria-label="Main store content">
-    <header id="header">
-      <button id="cartToggle" aria-label="Toggle shopping cart">Cart 🛒</button>
-    </header>
+  <main id="mainContent" tabindex="0" aria-label="Main Store Content">
+    <section id="explanation">
+      <h1>Welcome to TrendingCheapStore!</h1>
+      <p>Here's how our shop works:</p>
+      <ul>
+        <li>Use the <strong>Menu</strong> button (top-left) to browse product categories and subcategories.</li>
+        <li>Click on <em>Virtual</em> for digital goods like Fortnite accounts or V-Bucks.</li>
+        <li>Click on <em>Physical</em> for real-world products like Football items or Clothing.</li>
+        <li>Within categories, select subcategories and sub-subcategories to filter products.</li>
+        <li>You can search products and filter by price in Virtual category.</li>
+        <li>Click a product to add it to your cart.</li>
+        <li>Open your cart with the <strong>Cart</strong> button (top-right).</li>
+        <li>Adjust quantities in the cart by clicking +/- or typing the amount.</li>
+        <li>Apply promo code <strong>RELEASE</strong> once per session for 15% off your total.</li>
+        <li>Click outside the cart or on the main store area to close the cart.</li>
+      </ul>
+      <p>Enjoy shopping!</p>
+    </section>
 
-    <div id="filters" aria-label="Product search and price filter">
+    <div id="filters" aria-label="Product filters" hidden>
       <input type="search" id="searchInput" placeholder="Search products..." aria-label="Search products" />
       <select id="priceFilter" aria-label="Filter by price">
-        <option value="all">All Prices</option>
+        <option value="all">All prices</option>
         <option value="0-20">Under $20</option>
         <option value="20-50">$20 - $50</option>
         <option value="50-100">$50 - $100</option>
@@ -381,449 +392,412 @@
       </select>
     </div>
 
-    <section id="products" aria-live="polite" aria-label="Product listings">
-      <!-- Products go here -->
+    <section id="products" aria-live="polite" aria-atomic="true">
+      <!-- Products will appear here -->
     </section>
   </main>
+
+  <aside id="cartOverlay" aria-hidden="true" role="region" aria-label="Shopping cart">
+    <header id="cartHeader">
+      Cart
+      <button id="cartCloseBtn" aria-label="Close cart">×</button>
+    </header>
+    <div id="cartItems" role="list" tabindex="0" aria-label="Items in your cart">
+      <p>Your cart is empty.</p>
+    </div>
+    <footer id="cartFooter">
+      <div id="checkoutTotal">Total: $0.00</div>
+      <div id="promoContainer">
+        <input type="text" id="promoInput" aria-label="Enter promo code" placeholder="Enter promo code" />
+        <button id="promoBtn">Apply</button>
+      </div>
+      <div id="promoMsg" aria-live="assertive" role="alert"></div>
+    </footer>
+  </aside>
 </div>
 
-<!-- Cart overlay -->
-<aside id="cartOverlay" aria-label="Shopping cart" role="dialog" aria-modal="true" aria-hidden="true">
-  <h3>Your Cart</h3>
-  <div id="cartItems" role="list"></div>
-  <div id="checkoutTotal" aria-live="polite">Total: $0.00</div>
-  <div id="promoSection">
-    <input type="text" id="promoInput" placeholder="Promo code" aria-label="Enter promo code" />
-    <button id="promoBtn" aria-label="Apply promo code">Apply</button>
-  </div>
-  <div id="promoMsg" role="alert" aria-live="assertive"></div>
-</aside>
-
 <script>
-  // Data: Products by category/subcategory/subsubcategory
+  // Data for products (images from public sources)
   const productsData = {
     virtual: {
-      fortniteAccounts: [
-        { id: 'v1', name: 'FN Account Level 50', price: 45, image: 'https://cdn2.unrealengine.com/fortnite-fnf-fnf2-1920x1080-72e49d1c98c7.jpg' },
-        { id: 'v2', name: 'FN Account Level 100', price: 80, image: 'https://cdn2.unrealengine.com/fortnite-fnf-hero-1920x1080-96276b70d381.jpg' }
+      fortnite: [
+        { id: 'fnacc1', name: 'Fortnite Account - Level 50', price: 35, image: 'https://i.imgur.com/nqA2d2j.png' },
+        { id: 'fnacc2', name: 'Fortnite Account - Level 75', price: 50, image: 'https://i.imgur.com/nqA2d2j.png' },
+        { id: 'fnacc3', name: 'Fortnite Account - Level 100', price: 70, image: 'https://i.imgur.com/nqA2d2j.png' },
       ],
-      vBucks: [
-        { id: 'v3', name: '1,000 V-Bucks', price: 10, image: 'https://fortnite-api.com/images/currency/v-bucks.png' },
-        { id: 'v4', name: '5,000 V-Bucks', price: 45, image: 'https://fortnite-api.com/images/currency/v-bucks.png' }
+      vbucks: [
+        { id: 'vbucks1000', name: '1000 V-Bucks', price: 10, image: 'https://i.imgur.com/W9oih3b.png' },
+        { id: 'vbucks2500', name: '2500 V-Bucks', price: 23, image: 'https://i.imgur.com/W9oih3b.png' },
+        { id: 'vbucks5000', name: '5000 V-Bucks', price: 45, image: 'https://i.imgur.com/W9oih3b.png' },
       ]
     },
     physical: {
       football: {
         jerseys: [
-          { id: 'f1', name: 'FC Barcelona Jersey', price: 65, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021-22%29.png' },
-          { id: 'f2', name: 'Real Madrid Jersey', price: 70, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-          { id: 'f3', name: 'Galatasaray Jersey', price: 55, image: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Galatasaray_S.K._logo.svg' }
+          { id: 'fcbjersey', name: 'FC Barcelona Jersey', price: 85, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
+          { id: 'realmadridjersey', name: 'Real Madrid Jersey', price: 90, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
+          { id: 'psgjersey', name: 'Paris Saint-Germain Jersey', price: 95, image: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C._home_jersey_2020-21.png' },
         ],
-        mysteryBoxes: [
-          { id: 'f4', name: 'Football Mystery Box', price: 30, image: 'https://cdn-icons-png.flaticon.com/512/105/105218.png' }
+        mysteryboxes: [
+          { id: 'mysterybox1', name: 'Football Mystery Box 1', price: 40, image: 'https://i.imgur.com/mysterybox.png' },
+          { id: 'mysterybox2', name: 'Football Mystery Box 2', price: 60, image: 'https://i.imgur.com/mysterybox.png' },
         ],
         sets: [
-          { id: 'f5', name: 'Barcelona Set (Jersey + Socks)', price: 100, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021-22%29.png' },
-          { id: 'f6', name: 'Real Madrid Set (Jersey + Shorts)', price: 110, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' }
+          { id: 'fcbset', name: 'FC Barcelona Set (Jersey + Shorts)', price: 130, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
+          { id: 'realmadridset', name: 'Real Madrid Set (Jersey + Shorts)', price: 140, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
         ]
       },
       clothing: {
         socks: [
-          { id: 'c1', name: 'Comfort Socks', price: 12, image: 'https://cdn-icons-png.flaticon.com/512/1995/1995521.png' }
+          { id: 'sock1', name: 'Cotton Socks', price: 8, image: 'https://i.imgur.com/8VWwW9U.png' },
+          { id: 'sock2', name: 'Sports Socks', price: 12, image: 'https://i.imgur.com/8VWwW9U.png' },
         ],
         shirts: [
-          { id: 'c2', name: 'Casual Shirt', price: 25, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
+          { id: 'shirt1', name: 'Casual Shirt', price: 30, image: 'https://i.imgur.com/8t8tJxG.png' },
+          { id: 'shirt2', name: 'Formal Shirt', price: 50, image: 'https://i.imgur.com/8t8tJxG.png' },
         ],
         tshirts: [
-          { id: 'c3', name: 'Graphic T-Shirt', price: 18, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
+          { id: 'tshirt1', name: 'Basic T-Shirt', price: 20, image: 'https://i.imgur.com/pxmL8Iy.png' },
+          { id: 'tshirt2', name: 'Graphic T-Shirt', price: 28, image: 'https://i.imgur.com/pxmL8Iy.png' },
         ],
         pants: [
-          { id: 'c4', name: 'Jeans', price: 40, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
+          { id: 'pants1', name: 'Jeans', price: 40, image: 'https://i.imgur.com/NhEbE3x.png' },
+          { id: 'pants2', name: 'Chinos', price: 45, image: 'https://i.imgur.com/NhEbE3x.png' },
         ],
         shorts: [
-          { id: 'c5', name: 'Casual Shorts', price: 22, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
+          { id: 'shorts1', name: 'Denim Shorts', price: 25, image: 'https://i.imgur.com/6ULxPRd.png' },
+          { id: 'shorts2', name: 'Cargo Shorts', price: 30, image: 'https://i.imgur.com/6ULxPRd.png' },
         ],
-        swimShorts: [
-          { id: 'c6', name: 'Swimming Shorts', price: 30, image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' }
+        swimmingshorts: [
+          { id: 'swim1', name: 'Beach Swimming Shorts', price: 18, image: 'https://i.imgur.com/FZQUxqJ.png' },
+          { id: 'swim2', name: 'Pool Swimming Shorts', price: 20, image: 'https://i.imgur.com/FZQUxqJ.png' },
         ]
       }
     }
   };
 
-  // State variables
+  // State
   let currentCategory = null;
   let currentSubcategory = null;
-  let currentSubSubcategory = null;
+  let currentSubsubcategory = null;
   let cart = {};
   let discountApplied = false;
-  let usedPromo = false;
+  let promoUsed = false;
 
-  // DOM elements
+  // DOM Elements
+  const menuToggle = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const mainContent = document.getElementById('mainContent');
+  const container = document.getElementById('container');
   const cartToggle = document.getElementById('cartToggle');
   const cartOverlay = document.getElementById('cartOverlay');
-  const cartItemsDiv = document.getElementById('cartItems');
+  const cartCloseBtn = document.getElementById('cartCloseBtn');
+  const cartItemsEl = document.getElementById('cartItems');
   const checkoutTotal = document.getElementById('checkoutTotal');
   const promoInput = document.getElementById('promoInput');
   const promoBtn = document.getElementById('promoBtn');
   const promoMsg = document.getElementById('promoMsg');
+  const mainContent = document.getElementById('mainContent');
+  const filters = document.getElementById('filters');
   const searchInput = document.getElementById('searchInput');
   const priceFilter = document.getElementById('priceFilter');
 
-  // Utility: Format price
-  function formatPrice(num) {
-    return `$${num.toFixed(2)}`;
+  // Helper: format price
+  function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
   }
 
-  // Show/hide sidebar
-  sidebarToggle.addEventListener('click', () => {
+  // Show / hide sidebar
+  menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('open');
-    sidebar.setAttribute('aria-hidden', sidebar.classList.contains('open') ? 'false' : 'true');
+    container.classList.toggle('sidebar-open');
   });
 
-  // Clicking outside sidebar closes sidebar (optional)
+  // Close cart on main area click
   mainContent.addEventListener('click', () => {
-    if (sidebar.classList.contains('open')) {
-      sidebar.classList.remove('open');
-      sidebar.setAttribute('aria-hidden', 'true');
+    if (cartOverlay.classList.contains('visible')) {
+      toggleCart(false);
     }
   });
 
-  // Category buttons
-  document.querySelectorAll('#sidebar button.category-btn').forEach(btn => {
+  // Toggle cart visibility
+  function toggleCart(show) {
+    if (show) {
+      cartOverlay.classList.add('visible');
+      cartToggle.classList.add('hidden');
+      cartOverlay.setAttribute('aria-hidden', 'false');
+    } else {
+      cartOverlay.classList.remove('visible');
+      cartToggle.classList.remove('hidden');
+      cartOverlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+  cartToggle.addEventListener('click', () => toggleCart(true));
+  cartCloseBtn.addEventListener('click', () => toggleCart(false));
+
+  // Handle category clicks (Virtual, Physical)
+  document.getElementById('catVirtual').addEventListener('click', () => {
+    currentCategory = 'virtual';
+    currentSubcategory = null;
+    currentSubsubcategory = null;
+    filters.hidden = false;
+    setActiveCategory('catVirtual');
+    showSubcats('virtualSubcats');
+    hideSubcats('physicalSubcats');
+    hideSubsubcats();
+    renderProducts();
+  });
+
+  document.getElementById('catPhysical').addEventListener('click', () => {
+    currentCategory = 'physical';
+    currentSubcategory = null;
+    currentSubsubcategory = null;
+    filters.hidden = true;
+    setActiveCategory('catPhysical');
+    showSubcats('physicalSubcats');
+    hideSubcats('virtualSubcats');
+    hideSubsubcats();
+    renderProducts();
+  });
+
+  // Subcategory buttons for virtual (Fortnite, V-Bucks)
+  document.querySelectorAll('#virtualSubcats .subcat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      // Toggle subcats visibility
-      if (btn.id === 'catVirtual') {
-        toggleSubcat('virtualSubcats');
-        hideSubcat('physicalSubcats');
-        hideSubcat('footballSubsubcats');
-        hideSubcat('clothingSubsubcats');
-      } else if (btn.id === 'catPhysical') {
-        toggleSubcat('physicalSubcats');
-        hideSubcat('virtualSubcats');
-      }
-      // Mark active category
-      document.querySelectorAll('#sidebar button.category-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      currentCategory = btn.id === 'catVirtual' ? 'virtual' : 'physical';
-      // Reset deeper selections
-      currentSubcategory = null;
-      currentSubSubcategory = null;
+      currentSubcategory = btn.dataset.subcat;
+      currentSubsubcategory = null;
+      setActiveSubcat(btn);
       renderProducts();
     });
   });
 
-  // Subcategory buttons
-  document.querySelectorAll('#sidebar button.subcat-btn').forEach(btn => {
+  // Subcategory buttons for physical (Football, Clothing)
+  document.querySelectorAll('#physicalSubcats .subcat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const subcat = btn.dataset.subcat;
-      currentSubcategory = subcat;
-
-      // Show/hide subsubcats for physical
-      if (subcat === 'football') {
-        showSubcat('footballSubsubcats');
-        hideSubcat('clothingSubsubcats');
-      } else if (subcat === 'clothing') {
-        showSubcat('clothingSubsubcats');
-        hideSubcat('footballSubsubcats');
+      currentSubcategory = btn.dataset.subcat;
+      currentSubsubcategory = null;
+      setActiveSubcat(btn);
+      // Show subsubcats based on subcategory
+      if (currentSubcategory === 'football') {
+        showSubsubcats('footballSubsubcats');
+        hideSubsubcats('clothingSubsubcats');
+      } else if (currentSubcategory === 'clothing') {
+        showSubsubcats('clothingSubsubcats');
+        hideSubsubcats('footballSubsubcats');
       } else {
-        hideSubcat('footballSubsubcats');
-        hideSubcat('clothingSubsubcats');
+        hideSubsubcats();
       }
-
-      // Mark active subcat
-      document.querySelectorAll('#sidebar button.subcat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      // Reset subsubcat
-      currentSubSubcategory = null;
       renderProducts();
     });
   });
 
-  // Subsubcategory buttons
-  document.querySelectorAll('#sidebar button.subsubcat-btn').forEach(btn => {
+  // Subsubcategory buttons for football
+  document.querySelectorAll('#footballSubsubcats .subsubcat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const subsubcat = btn.dataset.subsubcat;
-      currentSubSubcategory = subsubcat;
-
-      // Mark active subsubcat
-      document.querySelectorAll('#sidebar button.subsubcat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
+      currentSubsubcategory = btn.dataset.subsubcat;
+      setActiveSubsubcat(btn);
       renderProducts();
     });
   });
 
-  // Helpers to show/hide subcat/subsubcat divs
-  function toggleSubcat(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (el.style.display === 'block') el.style.display = 'none';
-    else el.style.display = 'block';
+  // Subsubcategory buttons for clothing
+  document.querySelectorAll('#clothingSubsubcats .subsubcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubsubcategory = btn.dataset.subsubcat;
+      setActiveSubsubcat(btn);
+      renderProducts();
+    });
+  });
+
+  // Set active classes for categories and subcats
+  function setActiveCategory(id) {
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
   }
-  function showSubcat(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.display = 'block';
+
+  function setActiveSubcat(btn) {
+    btn.parentElement.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
-  function hideSubcat(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.display = 'none';
+
+  function setActiveSubsubcat(btn) {
+    btn.parentElement.querySelectorAll('.subsubcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Show/hide subcategory containers
+  function showSubcats(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function hideSubcats(id) {
+    if (id) {
+      document.getElementById(id).style.display = 'none';
+    }
+  }
+
+  // Show/hide subsubcategory containers
+  function showSubsubcats(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function hideSubsubcats(exceptId) {
+    ['footballSubsubcats', 'clothingSubsubcats'].forEach(id => {
+      if (id !== exceptId) {
+        document.getElementById(id).style.display = 'none';
+      }
+    });
   }
 
   // Render products based on current selections and filters
   function renderProducts() {
-    let products = [];
+    mainContent.innerHTML = ''; // Clear products display
+
+    let productsList = [];
 
     if (!currentCategory) {
-      document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a category to see products.</p>';
+      mainContent.innerHTML = `<div class="intro-text">
+        <h2>Welcome to Our Shop!</h2>
+        <p>Browse through virtual and physical products. Use the categories on the left to get started.</p>
+        <p>Add items to your cart and proceed to checkout. Use promo codes for discounts!</p>
+      </div>`;
       return;
     }
 
+    // Fetch products based on category and subcategories
     if (currentCategory === 'virtual') {
-      if (!currentSubcategory) {
-        document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a virtual product type.</p>';
-        return;
-      }
-      products = productsData.virtual[currentSubcategory] || [];
-    } else if (currentCategory === 'physical') {
-      if (!currentSubcategory) {
-        document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">Please select a physical product type.</p>';
-        return;
-      }
-      if (currentSubSubcategory) {
-        products = (productsData.physical[currentSubcategory] && productsData.physical[currentSubcategory][currentSubSubcategory]) || [];
+      if (currentSubcategory) {
+        productsList = productsData.virtual[currentSubcategory] || [];
       } else {
-        // Show all products under subcategory combined if no subsubcat selected
-        const subcatObj = productsData.physical[currentSubcategory];
-        if (subcatObj) {
-          products = Object.values(subcatObj).flat();
+        // If no subcategory selected, show all virtual products
+        productsList = Object.values(productsData.virtual).flat();
+      }
+    } else if (currentCategory === 'physical') {
+      if (currentSubcategory) {
+        if (currentSubsubcategory) {
+          productsList = productsData.physical[currentSubcategory][currentSubsubcategory] || [];
+        } else {
+          // If no subsubcategory, show all subsubcategory products in the subcategory
+          productsList = Object.values(productsData.physical[currentSubcategory]).flat();
         }
+      } else {
+        // No subcategory selected, show all physical products
+        productsList = Object.values(productsData.physical).flatMap(subcat => Object.values(subcat).flat());
       }
     }
 
-    // Apply search filter
+    // Filter by search term
     const searchTerm = searchInput.value.trim().toLowerCase();
     if (searchTerm) {
-      products = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+      productsList = productsList.filter(p => p.name.toLowerCase().includes(searchTerm));
     }
 
-    // Apply price filter
-    const priceVal = priceFilter.value;
-    if (priceVal !== 'all') {
-      products = products.filter(p => {
-        if (priceVal === '0-20') return p.price < 20;
-        if (priceVal === '20-50') return p.price >= 20 && p.price <= 50;
-        if (priceVal === '50-100') return p.price > 50 && p.price <= 100;
-        if (priceVal === '100+') return p.price > 100;
-        return true;
-      });
+    // Filter by price
+    const maxPrice = parseFloat(priceFilter.value);
+    if (!isNaN(maxPrice)) {
+      productsList = productsList.filter(p => p.price <= maxPrice);
     }
 
-    // Limit products to 12 max for demo
-    products = products.slice(0, 12);
-
-    // Render HTML
-    if (products.length === 0) {
-      document.getElementById('products').innerHTML = '<p style="grid-column: span 3; text-align:center; color:#555;">No products found.</p>';
+    if (productsList.length === 0) {
+      mainContent.innerHTML = '<p>No products found matching your criteria.</p>';
       return;
     }
-    const html = products.map(p => `
-      <article tabindex="0" class="product-item" role="button" aria-pressed="false" aria-label="Add ${p.name} to cart" data-id="${p.id}">
-        <img src="${p.image}" alt="${p.name}" loading="lazy" />
-        <div class="product-name">${p.name}</div>
-        <div class="price">${formatPrice(p.price)}</div>
-      </article>
-    `).join('');
-    document.getElementById('products').innerHTML = html;
 
-    // Add click handlers to add to cart
-    document.querySelectorAll('.product-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = el.dataset.id;
-        addToCart(id);
+    // Create product cards
+    productsList.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.className = 'product-card';
+
+      productCard.innerHTML = `
+        <img src="${product.image}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p class="price">${formatPrice(product.price)}</p>
+        <button aria-label="Add ${product.name} to cart" data-id="${product.id}">Add to Cart</button>
+      `;
+
+      productCard.querySelector('button').addEventListener('click', () => {
+        addToCart(product);
       });
-      el.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const id = el.dataset.id;
-          addToCart(id);
-        }
-      });
+
+      mainContent.appendChild(productCard);
     });
   }
 
-  // Get product info by id
-  function getProductById(id) {
-    for (const catKey in productsData) {
-      const cat = productsData[catKey];
-      if (catKey === 'virtual') {
-        for (const subcatKey in cat) {
-          const arr = cat[subcatKey];
-          for (const p of arr) if (p.id === id) return p;
-        }
-      } else if (catKey === 'physical') {
-        for (const subcatKey in cat) {
-          const subcat = cat[subcatKey];
-          for (const subsubcatKey in subcat) {
-            const arr = subcat[subsubcatKey];
-            for (const p of arr) if (p.id === id) return p;
-          }
-        }
-      }
+  // Add product to cart
+  function addToCart(product) {
+    if (cart[product.id]) {
+      cart[product.id].quantity += 1;
+    } else {
+      cart[product.id] = { ...product, quantity: 1 };
     }
-    return null;
+    updateCart();
   }
 
-  // Add to cart logic
-  function addToCart(id) {
-    if (!cart[id]) cart[id] = 1;
-    else cart[id]++;
-    updateCartUI();
-    openCart();
+  // Remove product from cart
+  function removeFromCart(productId) {
+    delete cart[productId];
+    updateCart();
   }
 
-  // Update cart UI
-  function updateCartUI() {
-    cartItemsDiv.innerHTML = '';
+  // Update cart display and total
+  function updateCart() {
+    cartItemsEl.innerHTML = '';
+
     let total = 0;
 
-    if (Object.keys(cart).length === 0) {
-      cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
-      checkoutTotal.textContent = 'Total: $0.00';
-      promoMsg.textContent = '';
-      discountApplied = false;
-      usedPromo = false;
-      promoInput.value = '';
-      promoInput.disabled = false;
-      promoBtn.disabled = false;
-      return;
-    }
-
-    for (const id in cart) {
-      const qty = cart[id];
-      const p = getProductById(id);
-      if (!p) continue;
-      total += p.price * qty;
-
-      const item = document.createElement('div');
-      item.className = 'cart-item';
-      item.setAttribute('role', 'listitem');
-      item.innerHTML = `
-        <img src="${p.image}" alt="${p.name}" />
-        <div class="cart-item-info">
-          <div class="cart-item-name">${p.name}</div>
-          <div class="cart-item-price">${formatPrice(p.price)}</div>
-        </div>
-        <div class="cart-quantity">
-          <button class="qty-btn" aria-label="Decrease quantity of ${p.name}" data-id="${id}" data-action="decrease">−</button>
-          <input class="qty-input" type="number" min="1" max="999" aria-label="Quantity of ${p.name}" data-id="${id}" value="${qty}" />
-          <button class="qty-btn" aria-label="Increase quantity of ${p.name}" data-id="${id}" data-action="increase">+</button>
-        </div>
+    Object.values(cart).forEach(item => {
+      total += item.price * item.quantity;
+      const cartItem = document.createElement('li');
+      cartItem.className = 'cart-item';
+      cartItem.innerHTML = `
+        <span>${item.name} (x${item.quantity})</span>
+        <span>${formatPrice(item.price * item.quantity)}</span>
+        <button aria-label="Remove ${item.name} from cart" data-id="${item.id}">Remove</button>
       `;
-      cartItemsDiv.appendChild(item);
-    }
+      cartItem.querySelector('button').addEventListener('click', () => {
+        removeFromCart(item.id);
+      });
+      cartItemsEl.appendChild(cartItem);
+    });
 
-    // Apply discount if any
-    if (discountApplied) total *= 0.85;
+    // Apply discount if promo used
+    if (promoUsed && !discountApplied) {
+      total *= 0.9; // 10% discount
+      discountApplied = true;
+      promoMsg.textContent = 'Promo code applied! 10% discount on your total.';
+      promoMsg.style.color = 'green';
+    }
 
     checkoutTotal.textContent = `Total: ${formatPrice(total)}`;
-  }
 
-  // Open/close cart
-  function openCart() {
-    cartOverlay.classList.add('visible');
-    cartOverlay.setAttribute('aria-hidden', 'false');
-    cartToggle.classList.add('hidden');
-  }
-  function closeCart() {
-    cartOverlay.classList.remove('visible');
-    cartOverlay.setAttribute('aria-hidden', 'true');
-    cartToggle.classList.remove('hidden');
-  }
-
-  // Cart toggle button
-  cartToggle.addEventListener('click', () => {
-    if (cartOverlay.classList.contains('visible')) closeCart();
-    else openCart();
-  });
-
-  // Clicking outside cart closes it
-  mainContent.addEventListener('click', () => {
-    if (cartOverlay.classList.contains('visible')) {
-      closeCart();
+    if (Object.keys(cart).length === 0) {
+      promoMsg.textContent = '';
+      discountApplied = false;
+      promoUsed = false;
+      checkoutTotal.textContent = 'Total: $0.00';
     }
-  });
-
-  // Stop clicks inside cart from closing
-  cartOverlay.addEventListener('click', e => {
-    e.stopPropagation();
-  });
-
-  // Quantity buttons & input handler (event delegation)
-  cartItemsDiv.addEventListener('click', e => {
-    if (!e.target.classList.contains('qty-btn')) return;
-    const id = e.target.dataset.id;
-    const action = e.target.dataset.action;
-    if (!id || !action) return;
-    if (!cart[id]) return;
-
-    if (action === 'increase') {
-      if (cart[id] < 999) cart[id]++;
-    } else if (action === 'decrease') {
-      if (cart[id] > 1) cart[id]--;
-    }
-    updateCartUI();
-  });
-
-  cartItemsDiv.addEventListener('input', e => {
-    if (!e.target.classList.contains('qty-input')) return;
-    const id = e.target.dataset.id;
-    if (!id) return;
-    let val = parseInt(e.target.value);
-    if (isNaN(val) || val < 1) val = 1;
-    if (val > 999) val = 999;
-    cart[id] = val;
-    updateCartUI();
-  });
+  }
 
   // Promo code logic
   promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toLowerCase();
-    if (!code) {
-      promoMsg.textContent = 'Please enter a promo code.';
-      return;
-    }
-    if (usedPromo) {
-      promoMsg.textContent = 'Promo code already used.';
-      return;
-    }
-    if (code === 'fortnite15') {
-      discountApplied = true;
-      usedPromo = true;
-      promoMsg.textContent = 'Promo code applied! 15% discount.';
-      promoInput.disabled = true;
-      promoBtn.disabled = true;
-      updateCartUI();
+    if (code === 'discount10') {
+      if (promoUsed) {
+        promoMsg.textContent = 'Promo code already used.';
+        promoMsg.style.color = 'red';
+      } else {
+        promoUsed = true;
+        discountApplied = false;
+        updateCart();
+      }
     } else {
       promoMsg.textContent = 'Invalid promo code.';
+      promoMsg.style.color = 'red';
     }
   });
 
-  // Search and filter listeners
+  // Search and filter events
   searchInput.addEventListener('input', renderProducts);
-  priceFilter.addEventListener('change', renderProducts);
+  priceFilter.addEventListener('input', renderProducts);
 
-  // Initialize by selecting the first category
-  document.getElementById('catVirtual').click();
-</script>
+  // Initial render
+  renderProducts();
+</script>  
 </body>
 </html>
