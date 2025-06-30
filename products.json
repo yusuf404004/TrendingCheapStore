@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "category": "football",
+    "name": "Barcelona Jersey 23/24",
+    "price": 49.99,
+    "img": "https://m.media-amazon.com/images/I/61yZC9IvZWL._AC_UL1500_.jpg",
+    "desc": "Official FC Barcelona home jersey."
+  },
+  {
+    "id": 2,
+    "category": "gaming",
+    "name": "Fortnite V-Bucks (2800)",
+    "price": 19.99,
+    "img": "https://cdn2.unrealengine.com/fortnite-v-bucks-2800-1920x1080-d3cbbf69cc9f.jpg",
+    "desc": "2800 Fortnite V-Bucks - Instant delivery."
+  },
+  {
+    "id": 3,
+    "category": "football",
+    "name": "Galatasaray Jersey 23/24",
+    "price": 44.99,
+    "img": "https://fanatics.frgimages.com/galatasaray/sk-galatasaray-nike-2023/24-home-shirt_ss5_p-13305375+pv-1+u-4a1nvfvvfef53z1xbokv+v-fp9h8pw9zdwvtkg1rfmx.jpg",
+    "desc": "Turkish champions home kit."
+  }
+]
