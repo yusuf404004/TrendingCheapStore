@@ -194,16 +194,27 @@
     .cart-item-name {
       font-weight: 600;
       color: #333;
-      max-width: 140px;
+      max-width: 110px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .cart-item-qty {
+    .cart-item-qty-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-weight: 600;
       font-size: 1rem;
-      color: #555;
-      margin: 0 10px;
       user-select: none;
+      transition: background 0.3s ease;
+      min-width: 45px;
+      text-align: center;
+    }
+    .cart-item-qty-btn:hover {
+      background: #219150;
     }
     .cart-item-price {
       font-weight: 700;
@@ -211,7 +222,7 @@
       min-width: 65px;
       text-align: right;
     }
-    .cart-item button {
+    .cart-item-remove-btn {
       background: none;
       border: none;
       color: #e74c3c;
@@ -221,7 +232,7 @@
       padding: 0 6px;
       transition: color 0.2s ease;
     }
-    .cart-item button:hover {
+    .cart-item-remove-btn:hover {
       color: #c0392b;
     }
 
@@ -272,10 +283,89 @@
       background: transparent;
     }
 
+    /* Extra content below store */
+    #extraContent {
+      max-width: 1000px;
+      margin-top: 60px;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      color: #444;
+      line-height: 1.6;
+      user-select: none;
+    }
+    #extraContent h2 {
+      margin-top: 0;
+      font-weight: 700;
+      color: #27ae60;
+      margin-bottom: 15px;
+    }
+    #extraContent p {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    /* Promo code area */
+    #promoCodeSection {
+      margin-top: 40px;
+      max-width: 1000px;
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      user-select: none;
+    }
+    #promoCodeSection input[type="text"] {
+      flex-grow: 1;
+      padding: 12px 15px;
+      font-size: 1.1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      outline-offset: 2px;
+      transition: border-color 0.3s ease;
+    }
+    #promoCodeSection input[type="text"]:focus {
+      border-color: #27ae60;
+    }
+    #promoCodeSection button {
+      background: #27ae60;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    #promoCodeSection button:hover {
+      background: #219150;
+    }
+    #promoMessage {
+      margin-left: 15px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    #promoMessage.success {
+      color: #27ae60;
+    }
+    #promoMessage.error {
+      color: #e74c3c;
+    }
+
     /* Responsive */
-    @media (max-width: 400px) {
-      #cartSidebar {
-        width: 100vw;
+    @media (max-width: 420px) {
+      #promoCodeSection {
+        flex-direction: column;
+        gap: 10px;
+      }
+      #promoMessage {
+        margin-left: 0;
       }
     }
   </style>
@@ -284,7 +374,7 @@
 
   <h1>Trending Cheap Store</h1>
 
-  <div id="products">
+  <div id="products" aria-live="polite" aria-label="Product List">
     <div class="product" tabindex="0" role="button" aria-pressed="false">
       <img src="https://via.placeholder.com/240x160?text=Wireless+Earbuds" alt="Wireless Earbuds" />
       <div class="product-info">
@@ -313,12 +403,27 @@
     </div>
   </div>
 
-  <button id="cartToggleBtn" aria-label="Toggle Shopping Cart">
+  <!-- Extra content below store to make page longer -->
+  <section id="extraContent" aria-label="More Deals and Info">
+    <h2>More Deals & Info</h2>
+    <p>Discover even more amazing products and exclusive discounts coming soon! Stay tuned for flash sales, bundle offers, and limited-time promotions.</p>
+    <p>Our team handpicks trending tech gadgets, cool accessories, and smart home devices just for you.</p>
+    <p>Sign up to our newsletter to never miss out on the hottest deals!</p>
+  </section>
+
+  <!-- Promo Code Section -->
+  <section id="promoCodeSection" aria-label="Promo Code">
+    <input type="text" id="promoCodeInput" placeholder="Enter promo code" aria-label="Enter promo code" />
+    <button id="applyPromoBtn" aria-label="Apply promo code">Submit</button>
+    <div id="promoMessage" role="alert" aria-live="assertive"></div>
+  </section>
+
+  <button id="cartToggleBtn" aria-label="Toggle Shopping Cart" aria-haspopup="true" aria-expanded="false">
     🛒
     <span id="cartCount" aria-live="polite" aria-atomic="true">0</span>
   </button>
 
-  <aside id="cartSidebar" aria-label="Shopping Cart">
+  <aside id="cartSidebar" aria-label="Shopping Cart" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
     <h2>Your Cart</h2>
     <div id="cartItems"></div>
     <div id="cartTotal">Total: $0.00</div>
@@ -330,39 +435,51 @@
     const cartToggleBtn = document.getElementById('cartToggleBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const cartItemsContainer = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const closeCartBtn = document.getElementById('closeCartBtn');
     const cartCount = document.getElementById('cartCount');
+    const cartTotal = document.getElementById('cartTotal');
+    const closeCartBtn = document.getElementById('closeCartBtn');
+    const promoCodeInput = document.getElementById('promoCodeInput');
+    const applyPromoBtn = document.getElementById('applyPromoBtn');
+    const promoMessage = document.getElementById('promoMessage');
 
-    let cart = [];
+    let cart = {};
+    let discountApplied = false;
 
-    function updateCartUI() {
-      cartItemsContainer.innerHTML = '';
+    // Load promo usage from localStorage (single use per visitor)
+    const promoUsedKey = 'promo_release_used';
+    const promoCodeValid = 'RELEASE';
+    let promoUsed = localStorage.getItem(promoUsedKey) === 'true';
 
-      if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-        cartTotal.textContent = 'Total: $0.00';
-        cartCount.textContent = '0';
-        return;
+    function updateCartCount() {
+      const totalQty = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+      cartCount.textContent = totalQty;
+      cartToggleBtn.setAttribute('aria-label', `Shopping cart with ${totalQty} items`);
+      if (totalQty === 0) {
+        cartCount.style.display = 'none';
+        discountApplied = false;  // reset discount if cart empty
+        promoUsed = false;
+        localStorage.removeItem(promoUsedKey);
+        promoMessage.textContent = '';
+        promoCodeInput.disabled = false;
+        applyPromoBtn.disabled = false;
+      } else {
+        cartCount.style.display = 'flex';
       }
+    }
 
+    function calculateTotal() {
       let total = 0;
-      let totalItems = 0;
-      cart.forEach(item => {
-        total += item.price * item.quantity;
-        totalItems += item.quantity;
+      for (const key in cart) {
+        total += cart[key].price * cart[key].qty;
+      }
+      return total;
+    }
 
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'cart-item';
-
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'cart-item-name';
-        nameDiv.textContent = item.name;
-
-        const qtyDiv = document.createElement('div');
-        qtyDiv.className = 'cart-item-qty';
-        qtyDiv.textContent = `x${item.quantity}`;
-
-        const priceDiv = document.createElement('div
-
+    function updateCartTotal() {
+      let total = calculateTotal();
+      if (discountApplied) {
+        const discountAmount = total * 0.15;
+        const discountedTotal = total - discountAmount;
+        cartTotal.innerHTML = `
+          Total: <s>$${total.toFixed(2)}</s> 
+          <strong style="color:#27ae60;">$${discountedTotal.to
