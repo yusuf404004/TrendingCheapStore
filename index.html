@@ -87,6 +87,8 @@
   #sideMenu .submenu button {
     background: #555;
     font-size: 0.9rem;
+    margin: 3px 0;
+    width: 100%;
   }
 
   /* Main content */
@@ -126,9 +128,10 @@
     max-width: 100%;
     height: 150px;
     object-fit: contain;
+    margin-bottom: 8px;
   }
   .product-card h3 {
-    margin: 10px 0 5px;
+    margin: 5px 0;
   }
   .product-card p {
     margin-bottom: 10px;
@@ -150,7 +153,7 @@
   #cart {
     position: fixed;
     top: 50px; right: 0;
-    width: 300px;
+    width: 320px;
     height: calc(100% - 50px);
     background: #f9f9f9;
     box-shadow: -3px 0 5px rgba(0,0,0,0.2);
@@ -219,6 +222,7 @@
   #cart-total {
     font-weight: bold;
     margin-top: 10px;
+    text-align: right;
   }
   #closeCartBtn {
     background: #cc0000;
@@ -239,6 +243,7 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    justify-content: flex-start;
   }
   #filters input[type="text"], #filters input[type="number"] {
     padding: 5px;
@@ -266,272 +271,440 @@
     background-color: #666;
     border-radius: 4px;
   }
+
+  /* Background flag for sets */
+  body[data-flag="esp"] { background: url('https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg') center/contain no-repeat; }
+  body[data-flag="eng"] { background: url('https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg') center/contain no-repeat; }
+  body[data-flag="ger"] { background: url('https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg') center/contain no-repeat; }
+  body[data-flag="tur"] { background: url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/contain no-repeat; }
+  body[data-flag="ita"] { background: url('https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg') center/contain no-repeat; }
+
+  /* Flag background styling */
+  body[data-flag] {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transition: background 0.5s ease;
+  }
+
+  /* Info modal */
+  #infoModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 90%;
+    max-width: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    z-index: 1100;
+    padding: 20px;
+    color: #111;
+    transition: transform 0.3s ease;
+  }
+  #infoModal.dark {
+    background: #222;
+    color: #eee;
+  }
+  #infoModal.open {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  #infoModal button.closeModal {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: #cc0000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
 </style>
 </head>
-<body>
+<body data-flag="">
 
 <header>
   <button id="menuBtn">☰ Menu</button>
+  <h1 style="flex-grow:1; text-align:center; font-size:1.2rem;">Trending Cheap Store</h1>
   <button id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
 </header>
 
-<nav id="sideMenu" aria-label="Side Menu">
+<nav id="sideMenu" aria-label="Shop categories menu">
   <h2>Categories</h2>
-  <button class="catBtn" data-cat="virtual">Virtual</button>
-  <button class="catBtn" data-cat="physical">Physical</button>
-  <div id="subMenu"></div>
+  <button class="catBtn" data-type="virtual">Virtual</button>
+  <div class="submenu" id="virtualSubmenu" style="display:none;">
+    <button class="subBtn" data-game="fortnite">Fortnite</button>
+    <button class="subBtn" data-game="roblox">Roblox</button>
+    <button class="subBtn" data-game="minecraft">Minecraft</button>
+    <button class="subBtn" data-game="apex">Apex Legends</button>
+    <button class="subBtn" data-game="callofduty">Call of Duty</button>
+    <button class="subBtn" data-game="valorant">Valorant</button>
+    <button class="subBtn" data-game="league">League of Legends</button>
+    <button class="subBtn" data-game="csgo">CS:GO</button>
+    <button class="subBtn" data-game="roblox">Roblox</button>
+    <button class="subBtn" data-game="gta">GTA V</button>
+  </div>
+  <button class="catBtn" data-type="physical">Physical</button>
+  <div class="submenu" id="physicalSubmenu" style="display:none;">
+    <button class="subBtn" data-physical="football">Football</button>
+    <button class="subBtn" data-physical="clothing">Clothing</button>
+  </div>
+  <div class="submenu" id="footballSubmenu" style="display:none; margin-left:15px;">
+    <button class="subBtn" data-football="jerseys">Jerseys</button>
+    <button class="subBtn" data-football="mysteryboxes">Mystery Boxes</button>
+    <button class="subBtn" data-football="sets">Sets (Jerseys & Shorts)</button>
+  </div>
+  <div class="submenu" id="clothingSubmenu" style="display:none; margin-left:15px;">
+    <button class="subBtn" data-clothing="socks">Socks</button>
+    <button class="subBtn" data-clothing="shirts">Shirts</button>
+    <button class="subBtn" data-clothing="tshirts">T-Shirts</button>
+    <button class="subBtn" data-clothing="pants">Pants</button>
+    <button class="subBtn" data-clothing="shorts">Shorts</button>
+    <button class="subBtn" data-clothing="swimmingshorts">Swimming Shorts</button>
+  </div>
 </nav>
 
-<main id="mainContent">
-  <div id="filters">
-    <input type="text" id="searchInput" placeholder="Search products..." />
-    <input type="number" id="minPrice" placeholder="Min Price" min="0" step="0.01" />
-    <input type="number" id="maxPrice" placeholder="Max Price" min="0" step="0.01" />
-    <button id="clearFiltersBtn">Clear Filters</button>
+<main id="mainContent" tabindex="0" aria-live="polite" aria-atomic="true">
+  <div id="filters" aria-label="Product filters">
+    <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products" />
+    <input type="number" id="minPrice" placeholder="Min price" min="0" aria-label="Minimum price" />
+    <input type="number" id="maxPrice" placeholder="Max price" min="0" aria-label="Maximum price" />
+    <button id="applyFiltersBtn" aria-label="Apply filters">Apply</button>
+    <button id="clearFiltersBtn" aria-label="Clear filters">Clear</button>
   </div>
-  <div id="productsGrid"></div>
+
+  <div id="productsGrid" role="list" aria-live="polite" aria-atomic="false"></div>
 </main>
 
-<aside id="cart" aria-label="Shopping Cart">
-  <button id="closeCartBtn">Close</button>
+<div id="cart" aria-label="Shopping cart" role="region" aria-live="polite" aria-atomic="true" tabindex="0">
   <h2>Your Cart</h2>
+  <button id="closeCartBtn" aria-label="Close cart">Close</button>
   <div id="cartItems"></div>
-  <p id="cart-total">Total: $0.00</p>
-</aside>
+  <div id="cart-total">Total: $0.00</div>
+</div>
+
+<!-- Info modal for product details -->
+<div id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle" aria-describedby="infoModalDesc">
+  <button class="closeModal" aria-label="Close product info">&times;</button>
+  <h2 id="infoModalTitle"></h2>
+  <img id="infoModalImg" src="" alt="" style="max-width: 100%; max-height: 200px; object-fit: contain; margin-bottom:10px;" />
+  <p id="infoModalDesc"></p>
+  <button id="infoAddToCartBtn">Add to Cart</button>
+</div>
 
 <script>
-  // Sample product data (you can add more)
+  // --- Data (sample) ---
+
   const productsData = {
     virtual: {
-      'Fortnite': [
-        { id: 'fn1', name: 'Fortnite Account', price: 49.99, image: 'https://i.imgur.com/eaUdbvf.png' },
-        { id: 'fn2', name: '1000 V-Bucks', price: 9.99, image: 'https://i.imgur.com/0UzWimv.png' },
+      fortnite: [
+        {id: 'fnacc1', name: 'Fortnite Account - Rare Skin', price: 15, desc: 'Rare Fortnite account with exclusive skins.', img: 'https://cdn2.unrealengine.com/fortnite-homepage-key-art-1920x1080-160343489.jpg'},
+        {id: 'vbucks1000', name: '1000 V-Bucks', price: 9.99, desc: '1000 Fortnite V-Bucks currency.', img: 'https://cdn-icons-png.flaticon.com/512/732/732240.png'}
       ],
-      'Roblox': [
-        { id: 'rb1', name: 'Roblox Account', price: 39.99, image: 'https://i.imgur.com/6U9QXKK.png' },
+      roblox: [
+        {id: 'rbacc1', name: 'Roblox Account - Builder', price: 8, desc: 'Roblox account with building tools.', img: 'https://cdn-icons-png.flaticon.com/512/179/179295.png'}
       ],
-      'Minecraft': [
-        { id: 'mc1', name: 'Minecraft Account', price: 29.99, image: 'https://i.imgur.com/MqNJz2S.png' },
+      minecraft: [
+        {id: 'mcacc1', name: 'Minecraft Account - Premium', price: 20, desc: 'Minecraft premium account.', img: 'https://cdn-icons-png.flaticon.com/512/3038/3038124.png'}
       ],
+      apex: [
+        {id: 'apexacc1', name: 'Apex Legends Account - Elite', price: 18, desc: 'Apex Legends account with high rank.', img: 'https://cdn-icons-png.flaticon.com/512/732/732251.png'}
+      ],
+      callofduty: [
+        {id: 'codacc1', name: 'Call of Duty Account - Pro', price: 22, desc: 'Call of Duty account with skins.', img: 'https://cdn-icons-png.flaticon.com/512/732/732221.png'}
+      ],
+      valorant: [
+        {id: 'valorantacc1', name: 'Valorant Account - Agent', price: 17, desc: 'Valorant account with agents.', img: 'https://cdn-icons-png.flaticon.com/512/732/732231.png'}
+      ],
+      league: [
+        {id: 'leagueacc1', name: 'League of Legends Account - Diamond', price: 25, desc: 'League of Legends high rank.', img: 'https://cdn-icons-png.flaticon.com/512/732/732252.png'}
+      ],
+      csgo: [
+        {id: 'csgoacc1', name: 'CS:GO Account - Global Elite', price: 30, desc: 'CS:GO account with skins.', img: 'https://cdn-icons-png.flaticon.com/512/732/732223.png'}
+      ],
+      gta: [
+        {id: 'gtaacc1', name: 'GTA V Account - VIP', price: 28, desc: 'GTA V account with money.', img: 'https://cdn-icons-png.flaticon.com/512/732/732222.png'}
+      ]
     },
     physical: {
       football: {
         jerseys: [
-          { id: 'jer1', name: 'FC Barcelona Jersey', price: 79.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_crest.svg' },
-          { id: 'jer2', name: 'Real Madrid Jersey', price: 84.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-          { id: 'jer3', name: 'Manchester United Jersey', price: 74.99, image: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg' },
-          { id: 'jer4', name: 'Fenerbahçe Jersey', price: 69.99, image: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Fenerbahce_S.K._logo.svg' },
-          { id: 'jer5', name: 'Galatasaray Jersey', price: 69.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/4a/Galatasaray_S.K._logo.svg' },
-          { id: 'jer6', name: 'Beşiktaş Jersey', price: 69.99, image: 'https://upload.wikimedia.org/wikipedia/en/1/1a/Besiktas_JK_logo.svg' },
+          {id: 'fcbarcajersey', name: 'FC Barcelona Jersey', price: 75, desc: 'Official FC Barcelona jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021%29.png', country: 'esp'},
+          {id: 'realmadridjersey', name: 'Real Madrid Jersey', price: 80, desc: 'Official Real Madrid jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', country: 'esp'},
+          {id: 'manutdjersey', name: 'Manchester United Jersey', price: 70, desc: 'Official Manchester United jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', country: 'eng'},
+          {id: 'liverpooljersey', name: 'Liverpool Jersey', price: 70, desc: 'Official Liverpool FC jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg', country: 'eng'},
+          {id: 'bayernjersey', name: 'Bayern Munich Jersey', price: 85, desc: 'Official Bayern Munich jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_(2017).svg', country: 'ger'},
+          {id: 'galatasarayjersey', name: 'Galatasaray Jersey', price: 60, desc: 'Official Galatasaray jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Galatasaray_Sports_Club_logo.svg', country: 'tur'},
+          {id: 'fenerbahcejersey', name: 'Fenerbahçe Jersey', price: 60, desc: 'Official Fenerbahçe jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Fenerbahce_Sport_Club_Logo.svg', country: 'tur'},
+          {id: 'besiktasjersey', name: 'Beşiktaş Jersey', price: 60, desc: 'Official Beşiktaş jersey 2023.', img: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Besiktas_JK_logo.svg', country: 'tur'}
         ],
-        shorts: [
-          { id: 'sho1', name: 'FC Barcelona Shorts', price: 39.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_crest.svg' },
-          { id: 'sho2', name: 'Real Madrid Shorts', price: 44.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-          { id: 'sho3', name: 'Manchester United Shorts', price: 34.99, image: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg' },
-          { id: 'sho4', name: 'Fenerbahçe Shorts', price: 29.99, image: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Fenerbahce_S.K._logo.svg' },
-          { id: 'sho5', name: 'Galatasaray Shorts', price: 29.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/4a/Galatasaray_S.K._logo.svg' },
-          { id: 'sho6', name: 'Beşiktaş Shorts', price: 29.99, image: 'https://upload.wikimedia.org/wikipedia/en/1/1a/Besiktas_JK_logo.svg' },
+        mysteryboxes: [
+          {id: 'mysterybox1', name: 'Football Mystery Box - Small', price: 30, desc: 'Random football merch box.', img: 'https://cdn-icons-png.flaticon.com/512/2907/2907246.png', country: ''},
+          {id: 'mysterybox2', name: 'Football Mystery Box - Large', price: 50, desc: 'Big football merch mystery box.', img: 'https://cdn-icons-png.flaticon.com/512/2907/2907246.png', country: ''}
         ],
         sets: [
-          { id: 'set1', name: 'FC Barcelona Jersey + Shorts Set', price: 109.99, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_crest.svg' },
-          { id: 'set2', name: 'Real Madrid Jersey + Shorts Set', price: 114.99, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-          { id: 'set3', name: 'Manchester United Jersey + Shorts Set', price: 99.99, image: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg' },
+          // Jerseys & shorts sets sorted by country below
+          {id: 'set1', name: 'FC Barcelona Jersey & Shorts Set', price: 130, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282021%29.png', country: 'esp', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set2', name: 'Real Madrid Jersey & Shorts Set', price: 135, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg', country: 'esp', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set3', name: 'Manchester United Jersey & Shorts Set', price: 125, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', country: 'eng', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set4', name: 'Liverpool Jersey & Shorts Set', price: 125, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg', country: 'eng', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set5', name: 'Bayern Munich Jersey & Shorts Set', price: 140, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_(2017).svg', country: 'ger', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set6', name: 'Galatasaray Jersey & Shorts Set', price: 110, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Galatasaray_Sports_Club_logo.svg', country: 'tur', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set7', name: 'Fenerbahçe Jersey & Shorts Set', price: 110, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Fenerbahce_Sport_Club_Logo.svg', country: 'tur', type: 'set', parts: ['jersey','shorts']},
+          {id: 'set8', name: 'Beşiktaş Jersey & Shorts Set', price: 110, desc: 'Official jersey and shorts.', img: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Besiktas_JK_logo.svg', country: 'tur', type: 'set', parts: ['jersey','shorts']}
         ]
       },
       clothing: {
         socks: [
-          { id: 'sock1', name: 'Sport Socks', price: 5.99, image: 'https://i.imgur.com/5FZbSpH.png' },
-          { id: 'sock2', name: 'Casual Socks', price: 3.99, image: 'https://i.imgur.com/NJ1Zcd8.png' },
+          {id: 'redsocks', name: 'Red Socks', price: 5, desc: 'Comfortable red socks.', img: 'https://cdn-icons-png.flaticon.com/512/616/616408.png'},
+          {id: 'bluesocks', name: 'Blue Socks', price: 5, desc: 'Comfortable blue socks.', img: 'https://cdn-icons-png.flaticon.com/512/616/616400.png'}
         ],
         shirts: [
-          { id: 'shirt1', name: 'Casual Shirt', price: 19.99, image: 'https://i.imgur.com/O0aZqKD.png' },
-          { id: 'shirt2', name: 'Formal Shirt', price: 24.99, image: 'https://i.imgur.com/7rk3QcX.png' },
+          {id: 'whiteshirt', name: 'White Shirt', price: 15, desc: 'Classic white shirt.', img: 'https://cdn-icons-png.flaticon.com/512/685/685655.png'}
         ],
         tshirts: [
-          { id: 'tshirt1', name: 'Graphic T-shirt', price: 14.99, image: 'https://i.imgur.com/bwWKn05.png' },
-          { id: 'tshirt2', name: 'Plain T-shirt', price: 9.99, image: 'https://i.imgur.com/1qUlDwz.png' },
+          {id: 'greentshirt', name: 'Green T-Shirt', price: 12, desc: 'Soft green t-shirt.', img: 'https://cdn-icons-png.flaticon.com/512/2991/2991125.png'}
         ],
         pants: [
-          { id: 'pants1', name: 'Jeans', price: 39.99, image: 'https://i.imgur.com/pkIl1kd.png' },
-          { id: 'pants2', name: 'Chinos', price: 29.99, image: 'https://i.imgur.com/wQxrZr6.png' },
+          {id: 'blackpants', name: 'Black Pants', price: 20, desc: 'Stylish black pants.', img: 'https://cdn-icons-png.flaticon.com/512/616/616554.png'}
         ],
         shorts: [
-          { id: 'shorts1', name: 'Denim Shorts', price: 19.99, image: 'https://i.imgur.com/Qc1sJLC.png' },
-          { id: 'shorts2', name: 'Sports Shorts', price: 14.99, image: 'https://i.imgur.com/2nJmOKM.png' },
+          {id: 'redsportsshorts', name: 'Red Sports Shorts', price: 18, desc: 'Comfortable sports shorts.', img: 'https://cdn-icons-png.flaticon.com/512/616/616408.png'}
         ],
-        swimshorts: [
-          { id: 'swim1', name: 'Beach Swim Shorts', price: 24.99, image: 'https://i.imgur.com/YKpqNKX.png' },
-          { id: 'swim2', name: 'Pool Swim Shorts', price: 19.99, image: 'https://i.imgur.com/63UyAxF.png' },
-        ],
+        swimmingshorts: [
+          {id: 'blueSwimShorts', name: 'Blue Swimming Shorts', price: 22, desc: 'Perfect for the pool.', img: 'https://cdn-icons-png.flaticon.com/512/616/616400.png'}
+        ]
       }
     }
   };
 
-  // State
-  let currentCategory = null;
-  let currentSubcategory = null;
+  // --- State ---
+  let currentCategory = '';
+  let currentSubcategory = '';
+  let currentSubSubcategory = '';
+  let filteredProducts = [];
   let cart = {};
 
-  // DOM
-  const menuBtn = document.getElementById('menuBtn');
-  const cartBtn = document.getElementById('cartBtn');
-  const sideMenu = document.getElementById('sideMenu');
-  const subMenu = document.getElementById('subMenu');
-  const mainContent = document.getElementById('mainContent');
-  const productsGrid = document.getElementById('productsGrid');
-  const cartSidebar = document.getElementById('cart');
-  const cartItemsContainer = document.getElementById('cartItems');
-  const cartCountSpan = document.getElementById('cartCount');
-  const cartTotal = document.getElementById('cart-total');
-  const closeCartBtn = document.getElementById('closeCartBtn');
-  const searchInput = document.getElementById('searchInput');
-  const minPriceInput = document.getElementById('minPrice');
-  const maxPriceInput = document.getElementById('maxPrice');
-  const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+  // --- Utility Functions ---
 
-  // Toggle menu
-  menuBtn.addEventListener('click', () => {
-    sideMenu.classList.toggle('open');
-    updateMainMargin();
-  });
-
-  function updateMainMargin() {
-    if(sideMenu.classList.contains('open')) {
-      mainContent.style.marginLeft = '220px';
-    } else {
-      mainContent.style.marginLeft = '0';
-    }
+  function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
   }
 
-  // Toggle cart
-  cartBtn.addEventListener('click', () => {
-    cartSidebar.classList.add('open');
-  });
-  closeCartBtn.addEventListener('click', () => {
-    cartSidebar.classList.remove('open');
-  });
-
-  // Category buttons
-  sideMenu.querySelectorAll('.catBtn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.getAttribute('data-cat');
-      currentCategory = cat;
-      currentSubcategory = null;
-      renderSubMenu(cat);
-      renderProducts(cat);
-    });
-  });
-
-  // Render submenu based on category
-  function renderSubMenu(cat) {
-    subMenu.innerHTML = '';
-    if(cat === 'virtual') {
-      for(let game in productsData.virtual) {
-        let b = document.createElement('button');
-        b.textContent = game;
-        b.className = 'catBtn';
-        b.onclick = () => {
-          currentSubcategory = game;
-          renderProducts(cat, game);
-        };
-        subMenu.appendChild(b);
-      }
-    } else if(cat === 'physical') {
-      for(let physCat in productsData.physical) {
-        let b = document.createElement('button');
-        b.textContent = physCat.charAt(0).toUpperCase() + physCat.slice(1);
-        b.className = 'catBtn';
-        b.onclick = () => {
-          currentSubcategory = physCat;
-          renderSubSubMenu(physCat);
-        };
-        subMenu.appendChild(b);
-      }
-    }
+  function updateCartCount() {
+    const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cartCount').textContent = count;
   }
 
-  // Render sub-sub-menu for physical category
-  function renderSubSubMenu(physCat) {
-    subMenu.innerHTML = '';
-    const subcats = productsData.physical[physCat];
-    for(let sub in subcats) {
-      let b = document.createElement('button');
-      b.textContent = sub.charAt(0).toUpperCase() + sub.slice(1);
-      b.className = 'catBtn';
-      b.onclick = () => {
-        currentSubcategory = physCat + '.' + sub;
-        renderProducts(physCat, sub);
+  function calculateCartTotal() {
+    return Object.values(cart).reduce((total, item) => total + item.price * item.quantity, 0);
+  }
+
+  function renderCart() {
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = '';
+    for (const id in cart) {
+      const item = cart[id];
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.textContent = `${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => {
+        delete cart[id];
+        renderCart();
+        updateCartCount();
+        updateCartTotal();
       };
-      subMenu.appendChild(b);
+      div.appendChild(removeBtn);
+      cartItems.appendChild(div);
     }
   }
 
-  // Render products
-  function renderProducts(cat, subcat) {
-    productsGrid.innerHTML = '';
-    let items = [];
-    if(cat === 'virtual' && subcat) {
-      items = productsData.virtual[subcat] || [];
-    } else if(cat === 'physical' && subcat) {
-      // subcat like "football", "clothing"
-      if(subcat.includes('.')) {
-        const [mainCat, subSubCat] = subcat.split('.');
-        items = productsData.physical[mainCat][subSubCat] || [];
-      } else {
-        // physical top level (football, clothing)
-        items = [];
-        const catData = productsData.physical[subcat];
-        for(let key in catData) {
-          items = items.concat(catData[key]);
-        }
-      }
-    } else if(cat && !subcat) {
-      // Show all in category
-      if(cat === 'virtual') {
-        for(let game in productsData.virtual) {
-          items = items.concat(productsData.virtual[game]);
-        }
-      } else if(cat === 'physical') {
-        for(let physCat in productsData.physical) {
-          const catData = productsData.physical[physCat];
-          for(let key in catData) {
-            items = items.concat(catData[key]);
-          }
-        }
-      }
-    } else {
-      // No category selected, show all products
-      for(let game in productsData.virtual) {
-        items = items.concat(productsData.virtual[game]);
-      }
-      for(let physCat in productsData.physical) {
-        const catData = productsData.physical[physCat];
-        for(let key in catData) {
-          items = items.concat(catData[key]);
-        }
-      }
-    }
+  function updateCartTotal() {
+    const totalDiv = document.getElementById('cart-total');
+    totalDiv.textContent = `Total: ${formatPrice(calculateCartTotal())}`;
+  }
 
-    // Filter by search and price
-    const searchVal = searchInput.value.trim().toLowerCase();
-    const minP = parseFloat(minPriceInput.value) || 0;
-    const maxP = parseFloat(maxPriceInput.value) || Number.MAX_VALUE;
-    items = items.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchVal);
-      const matchesPrice = item.price >= minP && item.price <= maxP;
-      return matchesSearch && matchesPrice;
-    });
+  // --- Rendering Functions ---
 
-    if(items.length === 0) {
-      productsGrid.innerHTML = '<p>No products found.</p>';
+  function renderProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+    if (products.length === 0) {
+      grid.textContent = 'No products found.';
       return;
     }
-
-    items.forEach(prod => {
+    for (const product of products) {
       const card = document.createElement('div');
       card.className = 'product-card';
-      card.innerHTML = `
-        <img src="${prod.image}" alt="${prod.name}" />
-        <h3>${prod.name}</h3>
-        <p>$${prod.price.toFixed(2)}</p>
-        <button data-id="${prod.id}">Add to Cart</button>
+      card.tabIndex = 0;
+      card.setAttribute('role', 'listitem');
+      card.setAttribute('aria-label', `${product.name}, priced at ${formatPrice(product.price)}`);
+
+      const img = document.createElement('img');
+      img.src = product.img;
+      img.alt = product.name;
+      card.appendChild(img);
+
+      const name = document.createElement('h3');
+      name.textContent = product.name;
+      card.appendChild(name);
+
+      const price = document.createElement('p');
+      price.textContent = formatPrice(product.price);
+      card.appendChild(price);
+
+      card.onclick = () => showProductInfo(product);
+      card.onkeypress = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showProductInfo(product);
+        }
+      };
+
+      grid.appendChild(card);
+    }
+  }
+
+  // --- Event Handlers ---
+
+  document.getElementById('menuBtn').onclick = () => {
+    const menu = document.getElementById('sideMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  };
+
+  document.querySelectorAll('.catBtn').forEach(btn => {
+    btn.onclick = () => {
+      const type = btn.dataset.type;
+      if (type === 'virtual') {
+        document.getElementById('virtualSubmenu').style.display = 'block';
+        document.getElementById('physicalSubmenu').style.display = 'none';
+        document.getElementById('footballSubmenu').style.display = 'none';
+        document.getElementById('clothingSubmenu').style.display = 'none';
+      } else if (type === 'physical') {
+        document.getElementById('virtualSubmenu').style.display = 'none';
+        document.getElementById('physicalSubmenu').style.display = 'block';
+      }
+    };
+  });
+
+  document.querySelectorAll('#physicalSubmenu > .subBtn').forEach(btn => {
+    btn.onclick = () => {
+      const sub = btn.dataset.physical;
+      if (sub === 'football') {
+        document.getElementById('footballSubmenu').style.display = 'block';
+        document.getElementById('clothingSubmenu').style.display = 'none';
+      } else if (sub === 'clothing') {
+        document.getElementById('footballSubmenu').style.display = 'none';
+        document.getElementById('clothingSubmenu').style.display = 'block';
+      }
+    };
+  });
+
+  document.querySelectorAll('.submenu .subBtn').forEach(btn => {
+    btn.onclick = () => {
+      // Reset sub-subcategories except football and clothing which are handled above
+      currentCategory = btn.closest('nav').querySelector('.catBtn[aria-pressed="true"]')?.dataset.type || currentCategory;
+
+      // Determine product list depending on data attributes
+      let productsList = [];
+      if (btn.dataset.game) {
+        productsList = productsData.virtual[btn.dataset.game] || [];
+      } else if (btn.dataset.football) {
+        productsList = productsData.physical.football[btn.dataset.football] || [];
+      } else if (btn.dataset.clothing) {
+        productsList = productsData.physical.clothing[btn.dataset.clothing] || [];
+      }
+      filteredProducts = productsList;
+      renderProducts(filteredProducts);
+    };
+  });
+
+  document.getElementById('applyFiltersBtn').onclick = () => {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const minPrice = parseFloat(document.getElementById('minPrice').value);
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+
+    let filtered = filteredProducts.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchText) || p.desc.toLowerCase().includes(searchText);
+      const matchesMin = isNaN(minPrice) ? true : p.price >= minPrice;
+      const matchesMax = isNaN(maxPrice) ? true : p.price <= maxPrice;
+      return matchesSearch && matchesMin && matchesMax;
+    });
+    renderProducts(filtered);
+  };
+
+  document.getElementById('clearFiltersBtn').onclick = () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('minPrice').value = '';
+    document.getElementById('maxPrice').value = '';
+    renderProducts(filteredProducts);
+  };
+
+  document.getElementById('cartBtn').onclick = () => {
+    const cartDiv = document.getElementById('cart');
+    cartDiv.style.display = 'block';
+    cartDiv.focus();
+    renderCart();
+    updateCartTotal();
+  };
+
+  document.getElementById('closeCartBtn').onclick = () => {
+    document.getElementById('cart').style.display = 'none';
+  };
+
+  // --- Modal for product info ---
+
+  function showProductInfo(product) {
+    const modal = document.getElementById('infoModal');
+    modal.querySelector('#infoModalTitle').textContent = product.name;
+    modal.querySelector('#infoModalImg').src = product.img;
+    modal.querySelector('#infoModalImg').alt = product.name;
+    modal.querySelector('#infoModalDesc').textContent = product.desc;
+    modal.style.display = 'block';
+    modal.classList.add('open');
+
+    const addToCartBtn = modal.querySelector('#infoAddToCartBtn');
+    addToCartBtn.onclick = () => {
+      addToCart(product);
+      closeProductInfo();
+    };
+
+    modal.querySelector('.closeModal').onclick = () => {
+      closeProductInfo();
+    };
+
+    // Close modal on outside click
+    modal.onclick = (e) => {
+      if (e.target === modal) closeProductInfo();
+    };
+  }
+
+  function closeProductInfo() {
+    const modal = document.getElementById('infoModal');
+    modal.style.display = 'none';
+    modal.classList.remove('open');
+  }
+
+  function addToCart(product) {
+    if (cart[product.id]) {
+      cart[product.id].quantity++;
+    } else {
+      cart[product.id] = {...product, quantity: 1};
+    }
+    updateCartCount();
+  }
+
+  // Initial render with default category (virtual -> fortnite)
+  currentCategory = 'virtual';
+  filteredProducts = productsData.virtual.fortnite;
+  renderProducts(filteredProducts);
+
+</script>
+</body>
+</html>
