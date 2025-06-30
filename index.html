@@ -3,31 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trending Cheap Store</title>
+  <title>Fully Functional Cart</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <button id="menuBtn">☰ Menu</button>
     <h1>Trending Cheap Store</h1>
-    <button id="cartBtn">🛒 Cart</button>
+    <button id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
   </header>
-
-  <aside id="sidebar" class="hidden">
-    <ul>
-      <li onclick="filterProducts('all')">All</li>
-      <li onclick="filterProducts('football')">Football</li>
-      <li onclick="filterProducts('gaming')">Gaming</li>
-    </ul>
-  </aside>
 
   <main id="productList"></main>
 
   <div id="cart" class="hidden">
     <h2>Your Cart</h2>
     <ul id="cartItems"></ul>
-    <p>Total: $<span id="totalPrice">0</span></p>
+    <p>Total: $<span id="totalPrice">0.00</span></p>
+    <button onclick="closeCart()">Close</button>
   </div>
+
+  <div id="overlay" class="hidden" onclick="closeCart()"></div>
 
   <script src="script.js"></script>
 </body>
