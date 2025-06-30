@@ -5,613 +5,799 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TrendingCheapStore</title>
 <style>
-  /* Basic reset */
+  /* Reset and base styles */
   * {
     box-sizing: border-box;
   }
-  body {
-    margin:0; padding:0;
-    font-family: Arial, sans-serif;
-    background: #121212;
-    color: #eee;
+  body, html {
+    margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #222;
+    height: 100vh; overflow-x: hidden;
   }
-  button {
-    cursor: pointer;
-  }
-  /* Header */
-  header {
+
+  /* Layout */
+  #container {
     display: flex;
-    justify-content: space-between;
-    padding: 1rem;
-    background: #222;
-  }
-  #menuBtn, #cartBtn {
-    background: #444;
-    border: none;
-    color: #eee;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-  }
-  /* Side menu */
-  #sideMenu {
-    position: fixed;
-    top: 0; left: 0;
     height: 100vh;
-    width: 250px;
-    background: #333;
-    padding: 1rem;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    overflow: hidden;
+  }
+  #sidebar {
+    background: #222;
+    color: white;
+    width: 260px;
+    position: fixed;
+    top: 0; left: -260px;
+    height: 100vh;
+    padding: 20px;
     overflow-y: auto;
-    z-index: 1000;
+    transition: left 0.3s ease;
+    z-index: 10;
   }
-  #sideMenu.open {
-    transform: translateX(0);
+  #sidebar.open {
+    left: 0;
   }
-  #sideMenu h2 {
+  #sidebar h2 {
     margin-top: 0;
   }
-  #sideMenu ul {
-    list-style: none;
-    padding: 0;
-  }
-  #sideMenu li {
-    margin: 1rem 0;
+  #sidebar button.category-btn, 
+  #sidebar button.subcat-btn,
+  #sidebar button.subsubcat-btn {
+    width: 100%;
+    text-align: left;
+    background: #333;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px 0;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
-    color: #ccc;
+    border-radius: 4px;
+    transition: background 0.2s;
   }
-  #sideMenu li:hover {
-    color: #fff;
+  #sidebar button.category-btn:hover,
+  #sidebar button.subcat-btn:hover,
+  #sidebar button.subsubcat-btn:hover {
+    background: #555;
   }
-  /* Cart */
-  #cart {
+  #sidebar button.active {
+    background: #0a84ff;
+  }
+  #sidebar .subcat-container,
+  #sidebar .subsubcat-container {
+    margin-left: 12px;
+    margin-top: 5px;
+  }
+  #sidebar .subcat-container, #sidebar .subsubcat-container {
+    display: none;
+  }
+  #sidebar .subcat-container.open,
+  #sidebar .subsubcat-container.open {
+    display: block;
+  }
+
+  /* Toggle menu button */
+  #menuToggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #0a84ff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 20;
+  }
+
+  /* Main content area */
+  #mainContent {
+    flex-grow: 1;
+    margin-left: 0;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+    overflow-y: auto;
+    height: 100vh;
+  }
+  #container.sidebar-open #mainContent {
+    margin-left: 260px;
+  }
+
+  /* Explanation on front page */
+  #explanation {
+    max-width: 900px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+  #explanation h1 {
+    margin-top: 0;
+    color: #0a84ff;
+  }
+  #explanation ul {
+    margin-left: 20px;
+  }
+
+  /* Filters for Virtual */
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    gap: 10px;
+  }
+  #filters input[type="search"],
+  #filters select {
+    padding: 7px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    flex: 1 1 200px;
+  }
+
+  /* Products grid */
+  #products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    max-width: 900px;
+    margin: 0 auto 50px;
+  }
+  .product-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    transition: box-shadow 0.2s ease;
+  }
+  .product-item:hover {
+    box-shadow: 0 6px 15px rgb(0 0 0 / 0.15);
+  }
+  .product-item img {
+    max-width: 100%;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    object-fit: contain;
+    height: 150px;
+  }
+  .product-name {
+    font-weight: bold;
+    padding: 12px 15px 5px;
+    font-size: 16px;
+    flex-grow: 1;
+  }
+  .price {
+    padding: 0 15px 15px;
+    font-size: 15px;
+    color: #0a84ff;
+    font-weight: 600;
+  }
+
+  /* Cart button */
+  #cartToggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: #0a84ff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 20;
+  }
+  #cartToggle.hidden {
+    display: none;
+  }
+
+  /* Cart overlay */
+  #cartOverlay {
     position: fixed;
     top: 0; right: 0;
+    width: 360px;
     height: 100vh;
-    width: 300px;
-    background: #222;
-    padding: 1rem;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.7);
-    display: none;
-    flex-direction: column;
-    z-index: 1000;
-  }
-  #cart.open {
+    background: white;
+    box-shadow: -5px 0 15px rgb(0 0 0 / 0.3);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 30;
     display: flex;
+    flex-direction: column;
   }
-  #cart h2 {
-    margin-top: 0;
+  #cartOverlay.visible {
+    transform: translateX(0);
   }
+  #cartHeader {
+    padding: 15px 20px;
+    font-weight: bold;
+    font-size: 18px;
+    background: #0a84ff;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #cartCloseBtn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  /* Cart items */
   #cartItems {
-    flex: 1;
+    flex-grow: 1;
     overflow-y: auto;
-    margin-bottom: 1rem;
+    padding: 15px 20px;
   }
   .cart-item {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
     align-items: center;
+    margin-bottom: 20px;
   }
-  .cart-item div {
-    flex: 1;
+  .cart-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-right: 12px;
   }
-  .cart-item-controls {
+  .cart-item-info {
+    flex-grow: 1;
+  }
+  .cart-item-name {
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .cart-item-price {
+    color: #0a84ff;
+    margin-top: 3px;
+    font-size: 14px;
+  }
+  .cart-quantity {
     display: flex;
     align-items: center;
+    gap: 5px;
   }
-  .cart-item-controls button {
-    background: #555;
+  .qty-btn {
+    background: #0a84ff;
     border: none;
-    color: #eee;
-    padding: 0.2rem 0.6rem;
-    margin: 0 0.3rem;
-    font-size: 1.2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
     line-height: 1;
   }
-  .cart-item-controls input {
-    width: 40px;
+  .qty-input {
+    width: 45px;
     text-align: center;
+    font-size: 14px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    border: none;
-    padding: 0.2rem;
-    font-size: 1rem;
+    padding: 3px;
   }
-  .removeBtn {
-    background: transparent;
-    border: none;
-    color: red;
-    font-size: 1.3rem;
-    margin-left: 0.5rem;
-    cursor: pointer;
+
+  /* Cart footer */
+  #cartFooter {
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
   }
-  #cart-total {
+  #checkoutTotal {
     font-weight: bold;
-    font-size: 1.2rem;
-    text-align: right;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #0a84ff;
   }
-  /* Main shop area */
-  #shopArea {
-    padding: 1rem;
-    margin-top: 1rem;
-    max-width: 1100px;
-    margin-left: auto;
-    margin-right: auto;
-    outline: none;
-  }
-  #filters {
+  #promoContainer {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 5px;
   }
-  #filters input {
-    padding: 0.5rem;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: none;
+  #promoInput {
     flex-grow: 1;
-    max-width: 200px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
   }
-  #filters button {
-    background: #444;
+  #promoBtn {
+    background: #0a84ff;
     border: none;
-    color: #eee;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 5px;
-  }
-  #productsGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-  .product-card {
-    background: #222;
-    padding: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .product-card:hover,
-  .product-card:focus {
-    background: #333;
-    outline: none;
-  }
-  .product-card img {
-    max-width: 100%;
-    height: 120px;
-    object-fit: contain;
-    margin-bottom: 0.5rem;
-  }
-  .product-card h3 {
-    margin: 0.3rem 0;
-    font-size: 1.1rem;
-    text-align: center;
-  }
-  .product-card p {
-    margin: 0;
+    color: white;
+    padding: 8px 14px;
     font-weight: bold;
-    font-size: 1rem;
-  }
-  /* Modal */
-  #infoModal {
-    position: fixed;
-    top: 0; left: 0; right:0; bottom:0;
-    background: rgba(0,0,0,0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1100;
-  }
-  #infoModal.open {
-    display: flex;
-  }
-  .modal-content {
-    background: #222;
-    padding: 2rem;
-    border-radius: 10px;
-    max-width: 400px;
-    width: 90%;
-    color: #eee;
-    text-align: center;
-    position: relative;
-  }
-  .modal-content img {
-    max-width: 100%;
-    height: 150px;
-    object-fit: contain;
-    margin-bottom: 1rem;
-  }
-  .closeModal {
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #eee;
     cursor: pointer;
+    border-radius: 4px;
   }
-  #modalQty {
-    width: 60px;
-    padding: 0.3rem;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: none;
-    text-align: center;
-  }
-  #addToCartBtn {
-    margin-top: 1rem;
-    background: #444;
-    border: none;
-    color: #eee;
-    padding: 0.7rem 1.5rem;
-    font-size: 1.1rem;
-    border-radius: 5px;
-  }
-  /* Responsive */
-  @media (max-width: 800px) {
-    #productsGrid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 500px) {
-    #productsGrid {
-      grid-template-columns: 1fr;
-    }
-    #sideMenu {
-      width: 200px;
-    }
-    #cart {
-      width: 250px;
-    }
+  #promoMsg {
+    color: #f44336;
+    font-size: 13px;
+    min-height: 18px;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <button id="menuBtn" aria-label="Open menu">Menu</button>
-  <button id="cartBtn" aria-label="Open cart">Cart (<span id="cartCount">0</span>)</button>
-</header>
+<button id="menuToggle" aria-label="Toggle menu">☰ Menu</button>
+<button id="cartToggle" aria-label="Open cart">🛒 Cart (0)</button>
 
-<nav id="sideMenu" aria-hidden="true" aria-label="Main menu">
-  <h2>Categories</h2>
-  <ul>
-    <li tabindex="0" id="virtualBtn">Virtual</li>
-    <li tabindex="0" id="physicalBtn">Physical</li>
-  </ul>
-  <div id="submenu"></div>
-</nav>
+<div id="container">
+  <nav id="sidebar" aria-label="Store Categories">
+    <h2>Categories</h2>
+    <button class="category-btn" id="catVirtual" aria-expanded="false">Virtual</button>
+    <div id="virtualSubcats" class="subcat-container">
+      <button class="subcat-btn" data-subcat="fortnite" aria-expanded="false">Fortnite</button>
+      <button class="subcat-btn" data-subcat="vbucks" aria-expanded="false">V-Bucks (Amounts)</button>
+    </div>
 
-<aside id="cart" aria-hidden="true" aria-label="Shopping cart">
-  <h2>Your Cart</h2>
-  <div id="cartItems" tabindex="0" aria-live="polite"></div>
-  <p id="cart-total">Total: $0.00</p>
-  <button id="checkoutBtn">Checkout</button>
-</aside>
+    <button class="category-btn" id="catPhysical" aria-expanded="false">Physical</button>
+    <div id="physicalSubcats" class="subcat-container">
+      <button class="subcat-btn" data-subcat="football" aria-expanded="false">Football</button>
+      <button class="subcat-btn" data-subcat="clothing" aria-expanded="false">Clothing</button>
+    </div>
 
-<main id="shopArea" tabindex="0" aria-label="Shop Products">
+    <div id="footballSubsubcats" class="subsubcat-container">
+      <button class="subsubcat-btn" data-subsubcat="jerseys">Jerseys</button>
+      <button class="subsubcat-btn" data-subsubcat="mysteryboxes">Mystery Boxes</button>
+      <button class="subsubcat-btn" data-subsubcat="sets">Sets</button>
+    </div>
 
-  <div id="filters">
-    <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products" />
-    <input type="number" id="minPrice" placeholder="Min Price" min="0" aria-label="Minimum price" />
-    <input type="number" id="maxPrice" placeholder="Max Price" min="0" aria-label="Maximum price" />
-    <button id="clearFilters">Clear</button>
-  </div>
+    <div id="clothingSubsubcats" class="subsubcat-container">
+      <button class="subsubcat-btn" data-subsubcat="socks">Socks</button>
+      <button class="subsubcat-btn" data-subsubcat="shirts">Shirts</button>
+      <button class="subsubcat-btn" data-subsubcat="tshirts">T-Shirts</button>
+      <button class="subsubcat-btn" data-subsubcat="pants">Pants</button>
+      <button class="subsubcat-btn" data-subsubcat="shorts">Shorts</button>
+      <button class="subsubcat-btn" data-subsubcat="swimmingshorts">Swimming Shorts</button>
+    </div>
+  </nav>
 
-  <div id="productsGrid" role="list" aria-live="polite">
-    <!-- Products go here -->
-  </div>
-</main>
+  <main id="mainContent" tabindex="0" aria-label="Main Store Content">
+    <section id="explanation">
+      <h1>Welcome to TrendingCheapStore!</h1>
+      <p>Here's how our shop works:</p>
+      <ul>
+        <li>Use the <strong>Menu</strong> button (top-left) to browse product categories and subcategories.</li>
+        <li>Click on <em>Virtual</em> for digital goods like Fortnite accounts or V-Bucks.</li>
+        <li>Click on <em>Physical</em> for real-world products like Football items or Clothing.</li>
+        <li>Within categories, select subcategories and sub-subcategories to filter products.</li>
+        <li>You can search products and filter by price in Virtual category.</li>
+        <li>Click a product to add it to your cart.</li>
+        <li>Open your cart with the <strong>Cart</strong> button (top-right).</li>
+        <li>Adjust quantities in the cart by clicking +/- or typing the amount.</li>
+        <li>Apply promo code <strong>RELEASE</strong> once per session for 15% off your total.</li>
+        <li>Click outside the cart or on the main store area to close the cart.</li>
+      </ul>
+      <p>Enjoy shopping!</p>
+    </section>
 
-<!-- Product detail modal -->
-<div id="infoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
-  <div class="modal-content">
-    <button class="closeModal" aria-label="Close modal">&times;</button>
-    <img src="" alt="" id="modalImg" />
-    <h3 id="modalTitle"></h3>
-    <p id="modalDesc"></p>
-    <p><strong>Price: $<span id="modalPrice"></span></strong></p>
-    <label for="modalQty">Quantity:</label>
-    <input type="number" id="modalQty" min="1" value="1" />
-    <button id="addToCartBtn">Add to Cart</button>
-  </div>
+    <div id="filters" aria-label="Product filters" hidden>
+      <input type="search" id="searchInput" placeholder="Search products..." aria-label="Search products" />
+      <select id="priceFilter" aria-label="Filter by price">
+        <option value="all">All prices</option>
+        <option value="0-20">Under $20</option>
+        <option value="20-50">$20 - $50</option>
+        <option value="50-100">$50 - $100</option>
+        <option value="100+">Over $100</option>
+      </select>
+    </div>
+
+    <section id="products" aria-live="polite" aria-atomic="true">
+      <!-- Products will appear here -->
+    </section>
+  </main>
+
+  <aside id="cartOverlay" aria-hidden="true" role="region" aria-label="Shopping cart">
+    <header id="cartHeader">
+      Cart
+      <button id="cartCloseBtn" aria-label="Close cart">×</button>
+    </header>
+    <div id="cartItems" role="list" tabindex="0" aria-label="Items in your cart">
+      <p>Your cart is empty.</p>
+    </div>
+    <footer id="cartFooter">
+      <div id="checkoutTotal">Total: $0.00</div>
+      <div id="promoContainer">
+        <input type="text" id="promoInput" aria-label="Enter promo code" placeholder="Enter promo code" />
+        <button id="promoBtn">Apply</button>
+      </div>
+      <div id="promoMsg" aria-live="assertive" role="alert"></div>
+    </footer>
+  </aside>
 </div>
 
 <script>
-(() => {
-  // Sample products (you can add more)
-  const products = [
-    {id: 1, name: "Nike Jersey - FC Barcelona", price: 89.99, category: "physical", subcategory:"football", type:"jersey", img:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020%29_logo.svg", desc: "Official Nike Barcelona Jersey."},
-    {id: 2, name: "Adidas Shorts - Real Madrid", price: 49.99, category: "physical", subcategory:"football", type:"shorts", img:"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", desc: "Adidas official shorts for Real Madrid."},
-    {id: 3, name: "Fortnite V-Bucks 1000", price: 9.99, category: "virtual", subcategory:"fortnite", type:"vbucks", img:"https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Fortnite_Chapter_2_Season_4_Icon.png/120px-Fortnite_Chapter_2_Season_4_Icon.png", desc: "1000 V-Bucks for Fortnite."},
-    {id: 4, name: "Roblox Account - Level 50", price: 29.99, category: "virtual", subcategory:"roblox", type:"account", img:"https://upload.wikimedia.org/wikipedia/en/thumb/e/e7/Roblox_Logo_2017.svg/120px-Roblox_Logo_2017.svg.png", desc: "Roblox account with level 50."},
-    {id: 5, name: "Mystery Football Box", price: 39.99, category: "physical", subcategory:"football", type:"mysterybox", img:"https://cdn-icons-png.flaticon.com/512/862/862811.png", desc: "A mystery box with football goodies."},
-    {id: 6, name: "Socks Pack", price: 9.99, category: "physical", subcategory:"clothing", type:"socks", img:"https://cdn-icons-png.flaticon.com/512/2921/2921828.png", desc: "Pack of 5 comfy socks."},
-    {id: 7, name: "T-shirt Classic", price: 14.99, category: "physical", subcategory:"clothing", type:"tshirt", img:"https://cdn-icons-png.flaticon.com/512/892/892458.png", desc: "Classic cotton T-shirt."},
-    {id: 8, name: "Pants Joggers", price: 29.99, category: "physical", subcategory:"clothing", type:"pants", img:"https://cdn-icons-png.flaticon.com/512/892/892465.png", desc: "Comfortable jogger pants."},
-    {id: 9, name: "FC Bayern Jersey", price: 79.99, category: "physical", subcategory:"football", type:"jersey", img:"https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/FC_Bayern_Munich_logo_(2017).svg/120px-FC_Bayern_Munich_logo_(2017).svg.png", desc: "Official Bayern Munich Jersey."},
-    {id: 10, name: "Manchester United Shorts", price: 44.99, category: "physical", subcategory:"football", type:"shorts", img:"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg", desc: "Official Man Utd shorts."},
-    {id: 11, name: "Juventus Jersey", price: 79.99, category: "physical", subcategory:"football", type:"jersey", img:"https://upload.wikimedia.org/wikipedia/en/3/3b/Juventus_FC_2017_logo.svg", desc: "Official Juventus Jersey."},
-    {id: 12, name: "Chelsea Jersey", price: 79.99, category: "physical", subcategory:"football", type:"jersey", img:"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg", desc: "Official Chelsea FC Jersey."},
-  ];
-
-  let cart = [];
-
-  // Elements
-  const menuBtn = document.getElementById('menuBtn');
-  const cartBtn = document.getElementById('cartBtn');
-  const sideMenu = document.getElementById('sideMenu');
-  const cart = document.getElementById('cart');
-  const cartItemsDiv = document.getElementById('cartItems');
-  const cartCountSpan = document.getElementById('cartCount');
-  const cartTotalP = document.getElementById('cart-total');
-  const shopArea = document.getElementById('shopArea');
-  const productsGrid = document.getElementById('productsGrid');
-  const searchInput = document.getElementById('searchInput');
-  const minPriceInput = document.getElementById('minPrice');
-  const maxPriceInput = document.getElementById('maxPrice');
-  const clearFiltersBtn = document.getElementById('clearFilters');
-  const infoModal = document.getElementById('infoModal');
-  const modalImg = document.getElementById('modalImg');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalDesc = document.getElementById('modalDesc');
-  const modalPrice = document.getElementById('modalPrice');
-  const modalQty = document.getElementById('modalQty');
-  const addToCartBtn = document.getElementById('addToCartBtn');
-  const closeModalBtn = document.querySelector('.closeModal');
-  const submenuDiv = document.getElementById('submenu');
-  const virtualBtn = document.getElementById('virtualBtn');
-  const physicalBtn = document.getElementById('physicalBtn');
-
-  // Avoid conflict with cart variable naming
-  const cartPanel = cart;
-
-  // Menu toggle
-  menuBtn.addEventListener('click', () => {
-    sideMenu.classList.add('open');
-    sideMenu.setAttribute('aria-hidden', 'false');
-    menuBtn.style.display = 'none';
-    if(cartPanel.classList.contains('open')) toggleCart();
-    submenuDiv.innerHTML = ''; // reset submenu
-  });
-
-  // Clicking outside menu or shop closes menu and cart if open
-  shopArea.addEventListener('click', () => {
-    if(sideMenu.classList.contains('open')) {
-      sideMenu.classList.remove('open');
-      sideMenu.setAttribute('aria-hidden', 'true');
-      menuBtn.style.display = 'inline-block';
-    }
-    if(cartPanel.classList.contains('open')) {
-      toggleCart();
-    }
-  });
-
-  // Cart toggle function
-  function toggleCart() {
-    if(cartPanel.classList.contains('open')) {
-      cartPanel.classList.remove('open');
-      cartPanel.setAttribute('aria-hidden', 'true');
-      cartBtn.style.display = 'inline-block';
-    } else {
-      cartPanel.classList.add('open');
-      cartPanel.setAttribute('aria-hidden', 'false');
-      cartBtn.style.display = 'none';
-      if(sideMenu.classList.contains('open')) {
-        sideMenu.classList.remove('open');
-        sideMenu.setAttribute('aria-hidden', 'true');
-        menuBtn.style.display = 'inline-block';
+  // Data for products (images from public sources)
+  const productsData = {
+    virtual: {
+      fortnite: [
+        { id: 'fnacc1', name: 'Fortnite Account - Level 50', price: 35, image: 'https://i.imgur.com/nqA2d2j.png' },
+        { id: 'fnacc2', name: 'Fortnite Account - Level 75', price: 50, image: 'https://i.imgur.com/nqA2d2j.png' },
+        { id: 'fnacc3', name: 'Fortnite Account - Level 100', price: 70, image: 'https://i.imgur.com/nqA2d2j.png' },
+      ],
+      vbucks: [
+        { id: 'vbucks1000', name: '1000 V-Bucks', price: 10, image: 'https://i.imgur.com/W9oih3b.png' },
+        { id: 'vbucks2500', name: '2500 V-Bucks', price: 23, image: 'https://i.imgur.com/W9oih3b.png' },
+        { id: 'vbucks5000', name: '5000 V-Bucks', price: 45, image: 'https://i.imgur.com/W9oih3b.png' },
+      ]
+    },
+    physical: {
+      football: {
+        jerseys: [
+          { id: 'fcbjersey', name: 'FC Barcelona Jersey', price: 85, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
+          { id: 'realmadridjersey', name: 'Real Madrid Jersey', price: 90, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
+          { id: 'psgjersey', name: 'Paris Saint-Germain Jersey', price: 95, image: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C._home_jersey_2020-21.png' },
+        ],
+        mysteryboxes: [
+          { id: 'mysterybox1', name: 'Football Mystery Box 1', price: 40, image: 'https://i.imgur.com/mysterybox.png' },
+          { id: 'mysterybox2', name: 'Football Mystery Box 2', price: 60, image: 'https://i.imgur.com/mysterybox.png' },
+        ],
+        sets: [
+          { id: 'fcbset', name: 'FC Barcelona Set (Jersey + Shorts)', price: 130, image: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282020-21%29_home_kit.png' },
+          { id: 'realmadridset', name: 'Real Madrid Set (Jersey + Shorts)', price: 140, image: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF_2020_21_Kit.png' },
+        ]
+      },
+      clothing: {
+        socks: [
+          { id: 'sock1', name: 'Cotton Socks', price: 8, image: 'https://i.imgur.com/8VWwW9U.png' },
+          { id: 'sock2', name: 'Sports Socks', price: 12, image: 'https://i.imgur.com/8VWwW9U.png' },
+        ],
+        shirts: [
+          { id: 'shirt1', name: 'Casual Shirt', price: 30, image: 'https://i.imgur.com/8t8tJxG.png' },
+          { id: 'shirt2', name: 'Formal Shirt', price: 50, image: 'https://i.imgur.com/8t8tJxG.png' },
+        ],
+        tshirts: [
+          { id: 'tshirt1', name: 'Basic T-Shirt', price: 20, image: 'https://i.imgur.com/pxmL8Iy.png' },
+          { id: 'tshirt2', name: 'Graphic T-Shirt', price: 28, image: 'https://i.imgur.com/pxmL8Iy.png' },
+        ],
+        pants: [
+          { id: 'pants1', name: 'Jeans', price: 40, image: 'https://i.imgur.com/NhEbE3x.png' },
+          { id: 'pants2', name: 'Chinos', price: 45, image: 'https://i.imgur.com/NhEbE3x.png' },
+        ],
+        shorts: [
+          { id: 'shorts1', name: 'Denim Shorts', price: 25, image: 'https://i.imgur.com/6ULxPRd.png' },
+          { id: 'shorts2', name: 'Cargo Shorts', price: 30, image: 'https://i.imgur.com/6ULxPRd.png' },
+        ],
+        swimmingshorts: [
+          { id: 'swim1', name: 'Beach Swimming Shorts', price: 18, image: 'https://i.imgur.com/FZQUxqJ.png' },
+          { id: 'swim2', name: 'Pool Swimming Shorts', price: 20, image: 'https://i.imgur.com/FZQUxqJ.png' },
+        ]
       }
     }
+  };
+
+  // State
+  let currentCategory = null;
+  let currentSubcategory = null;
+  let currentSubsubcategory = null;
+  let cart = {};
+  let discountApplied = false;
+  let promoUsed = false;
+
+  // DOM Elements
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const container = document.getElementById('container');
+  const cartToggle = document.getElementById('cartToggle');
+  const cartOverlay = document.getElementById('cartOverlay');
+  const cartCloseBtn = document.getElementById('cartCloseBtn');
+  const cartItemsEl = document.getElementById('cartItems');
+  const checkoutTotal = document.getElementById('checkoutTotal');
+  const promoInput = document.getElementById('promoInput');
+  const promoBtn = document.getElementById('promoBtn');
+  const promoMsg = document.getElementById('promoMsg');
+  const mainContent = document.getElementById('mainContent');
+  const filters = document.getElementById('filters');
+  const searchInput = document.getElementById('searchInput');
+  const priceFilter = document.getElementById('priceFilter');
+
+  // Helper: format price
+  function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
   }
 
-  cartBtn.addEventListener('click', toggleCart);
-
-  // Render products (with optional filters)
-  function renderProducts(filters = {}) {
-    let filtered = [...products];
-    if(filters.search) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(filters.search.toLowerCase()));
-    }
-    if(filters.minPrice != null) {
-      filtered = filtered.filter(p => p.price >= filters.minPrice);
-    }
-    if(filters.maxPrice != null) {
-      filtered = filtered.filter(p => p.price <= filters.maxPrice);
-    }
-    // Clear existing
-    productsGrid.innerHTML = '';
-    if(filtered.length === 0) {
-      productsGrid.innerHTML = '<p>No products found.</p>';
-      return;
-    }
-    filtered.forEach(prod => {
-      const div = document.createElement('div');
-      div.className = 'product-card';
-      div.tabIndex = 0;
-      div.setAttribute('role', 'listitem');
-      div.innerHTML = `
-        <img src="${prod.img}" alt="${prod.name}" />
-        <h3>${prod.name}</h3>
-        <p>$${prod.price.toFixed(2)}</p>
-      `;
-      // Open modal on click or enter key
-      div.addEventListener('click', () => openModal(prod));
-      div.addEventListener('keydown', e => {
-        if(e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openModal(prod);
-        }
-      });
-      productsGrid.appendChild(div);
-    });
-  }
-
-  // Open product modal
-  function openModal(product) {
-    modalImg.src = product.img;
-    modalImg.alt = product.name;
-    modalTitle.textContent = product.name;
-    modalDesc.textContent = product.desc;
-    modalPrice.textContent = product.price.toFixed(2);
-    modalQty.value = 1;
-    infoModal.classList.add('open');
-    addToCartBtn.onclick = () => {
-      addToCart(product, parseInt(modalQty.value));
-      closeModal();
-    };
-  }
-
-  // Close modal
-  function closeModal() {
-    infoModal.classList.remove('open');
-  }
-  closeModalBtn.addEventListener('click', closeModal);
-  infoModal.addEventListener('click', e => {
-    if(e.target === infoModal) closeModal();
+  // Show / hide sidebar
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    container.classList.toggle('sidebar-open');
   });
 
-  // Add to cart
-  function addToCart(product, qty) {
-    if(qty < 1) return;
-    const found = cart.find(i => i.id === product.id);
-    if(found) {
-      found.qty += qty;
+  // Close cart on main area click
+  mainContent.addEventListener('click', () => {
+    if (cartOverlay.classList.contains('visible')) {
+      toggleCart(false);
+    }
+  });
+
+  // Toggle cart visibility
+  function toggleCart(show) {
+    if (show) {
+      cartOverlay.classList.add('visible');
+      cartToggle.classList.add('hidden');
+      cartOverlay.setAttribute('aria-hidden', 'false');
     } else {
-      cart.push({id: product.id, qty, product});
+      cartOverlay.classList.remove('visible');
+      cartToggle.classList.remove('hidden');
+      cartOverlay.setAttribute('aria-hidden', 'true');
     }
-    updateCartUI();
   }
+  cartToggle.addEventListener('click', () => toggleCart(true));
+  cartCloseBtn.addEventListener('click', () => toggleCart(false));
 
-  // Remove from cart
-  function removeFromCart(id) {
-    cart = cart.filter(item => item.id !== id);
-    updateCartUI();
-  }
-
-  // Update cart UI
-  function updateCartUI() {
-    cartItemsDiv.innerHTML = '';
-    if(cart.length === 0) {
-      cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
-      cartCountSpan.textContent = '0';
-      cartTotalP.textContent = 'Total: $0.00';
-      return;
-    }
-    let total = 0;
-    cart.forEach(item => {
-      total += item.product.price * item.qty;
-      const div = document.createElement('div');
-      div.className = 'cart-item';
-      div.innerHTML = `
-        <div>${item.product.name}</div>
-        <div class="cart-item-controls">
-          <button aria-label="Decrease quantity" class="decBtn">-</button>
-          <input type="number" min="1" value="${item.qty}" aria-label="Quantity for ${item.product.name}" />
-          <button aria-label="Increase quantity" class="incBtn">+</button>
-          <button aria-label="Remove item" class="removeBtn">&times;</button>
-        </div>
-      `;
-      const decBtn = div.querySelector('.decBtn');
-      const incBtn = div.querySelector('.incBtn');
-      const qtyInput = div.querySelector('input');
-      const removeBtn = div.querySelector('.removeBtn');
-
-      decBtn.addEventListener('click', () => {
-        if(item.qty > 1) {
-          item.qty--;
-          qtyInput.value = item.qty;
-          updateCartUI();
-        }
-      });
-      incBtn.addEventListener('click', () => {
-        item.qty++;
-        qtyInput.value = item.qty;
-        updateCartUI();
-      });
-      qtyInput.addEventListener('change', () => {
-        let val = parseInt(qtyInput.value);
-        if(isNaN(val) || val < 1) val = 1;
-        item.qty = val;
-        qtyInput.value = val;
-        updateCartUI();
-      });
-      removeBtn.addEventListener('click', () => {
-        removeFromCart(item.id);
-      });
-
-      cartItemsDiv.appendChild(div);
-    });
-    cartCountSpan.textContent = cart.reduce((acc, item) => acc + item.qty, 0);
-    cartTotalP.textContent = `Total: $${total.toFixed(2)}`;
-  }
-
-  // Search and filter
-  searchInput.addEventListener('input', filterProducts);
-  minPriceInput.addEventListener('input', filterProducts);
-  maxPriceInput.addEventListener('input', filterProducts);
-  clearFiltersBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    minPriceInput.value = '';
-    maxPriceInput.value = '';
+  // Handle category clicks (Virtual, Physical)
+  document.getElementById('catVirtual').addEventListener('click', () => {
+    currentCategory = 'virtual';
+    currentSubcategory = null;
+    currentSubsubcategory = null;
+    filters.hidden = false;
+    setActiveCategory('catVirtual');
+    showSubcats('virtualSubcats');
+    hideSubcats('physicalSubcats');
+    hideSubsubcats();
     renderProducts();
   });
 
-  function filterProducts() {
-    const search = searchInput.value.trim();
-    const minPrice = minPriceInput.value ? parseFloat(minPriceInput.value) : null;
-    const maxPrice = maxPriceInput.value ? parseFloat(maxPriceInput.value) : null;
-    renderProducts({search, minPrice, maxPrice});
+  document.getElementById('catPhysical').addEventListener('click', () => {
+    currentCategory = 'physical';
+    currentSubcategory = null;
+    currentSubsubcategory = null;
+    filters.hidden = true;
+    setActiveCategory('catPhysical');
+    showSubcats('physicalSubcats');
+    hideSubcats('virtualSubcats');
+    hideSubsubcats();
+    renderProducts();
+  });
+
+  // Subcategory buttons for virtual (Fortnite, V-Bucks)
+  document.querySelectorAll('#virtualSubcats .subcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubcategory = btn.dataset.subcat;
+      currentSubsubcategory = null;
+      setActiveSubcat(btn);
+      renderProducts();
+    });
+  });
+
+  // Subcategory buttons for physical (Football, Clothing)
+  document.querySelectorAll('#physicalSubcats .subcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubcategory = btn.dataset.subcat;
+      currentSubsubcategory = null;
+      setActiveSubcat(btn);
+      // Show subsubcats based on subcategory
+      if (currentSubcategory === 'football') {
+        showSubsubcats('footballSubsubcats');
+        hideSubsubcats('clothingSubsubcats');
+      } else if (currentSubcategory === 'clothing') {
+        showSubsubcats('clothingSubsubcats');
+        hideSubsubcats('footballSubsubcats');
+      } else {
+        hideSubsubcats();
+      }
+      renderProducts();
+    });
+  });
+
+  // Subsubcategory buttons for football
+  document.querySelectorAll('#footballSubsubcats .subsubcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubsubcategory = btn.dataset.subsubcat;
+      setActiveSubsubcat(btn);
+      renderProducts();
+    });
+  });
+
+  // Subsubcategory buttons for clothing
+  document.querySelectorAll('#clothingSubsubcats .subsubcat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubsubcategory = btn.dataset.subsubcat;
+      setActiveSubsubcat(btn);
+      renderProducts();
+    });
+  });
+
+  // Set active classes for categories and subcats
+  function setActiveCategory(id) {
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
   }
 
-  // Submenu for categories
-  function buildSubmenu(category) {
-    submenuDiv.innerHTML = '';
-    const filtered = products.filter(p => p.category === category);
-    if(filtered.length === 0) {
-      submenuDiv.innerHTML = '<p>No products in this category.</p>';
+  function setActiveSubcat(btn) {
+    btn.parentElement.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function setActiveSubsubcat(btn) {
+    btn.parentElement.querySelectorAll('.subsubcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Show/hide subcategory containers
+  function showSubcats(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function hideSubcats(id) {
+    if (id) {
+      document.getElementById(id).style.display = 'none';
+    }
+  }
+
+  // Show/hide subsubcategory containers
+  function showSubsubcats(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function hideSubsubcats(exceptId) {
+    ['footballSubsubcats', 'clothingSubsubcats'].forEach(id => {
+      if (id !== exceptId) {
+        document.getElementById(id).style.display = 'none';
+      }
+    });
+  }
+
+  // Render products based on current selections and filters
+  function renderProducts() {
+    mainContent.innerHTML = ''; // Clear products display
+
+    let productsList = [];
+
+    if (!currentCategory) {
+      mainContent.innerHTML = `<div class="intro-text">
+        <h2>Welcome to Our Shop!</h2>
+        <p>Browse through virtual and physical products. Use the categories on the left to get started.</p>
+        <p>Add items to your cart and proceed to checkout. Use promo codes for discounts!</p>
+      </div>`;
       return;
     }
-    const ul = document.createElement('ul');
-    ul.style.listStyle = 'none';
-    ul.style.padding = '0';
-    ul.style.marginTop = '1rem';
-    const types = [...new Set(filtered.map(p => p.subcategory))];
-    types.forEach(type => {
-      const li = document.createElement('li');
-      li.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-      li.tabIndex = 0;
-      li.style.cursor = 'pointer';
-      li.style.margin = '0.5rem 0';
-      li.addEventListener('click', () => {
-        renderProducts({search: '', minPrice: null, maxPrice: null, category, subcategory: type});
-        sideMenu.classList.remove('open');
-        sideMenu.setAttribute('aria-hidden', 'true');
-        menuBtn.style.display = 'inline-block';
+
+    // Fetch products based on category and subcategories
+    if (currentCategory === 'virtual') {
+      if (currentSubcategory) {
+        productsList = productsData.virtual[currentSubcategory] || [];
+      } else {
+        // If no subcategory selected, show all virtual products
+        productsList = Object.values(productsData.virtual).flat();
+      }
+    } else if (currentCategory === 'physical') {
+      if (currentSubcategory) {
+        if (currentSubsubcategory) {
+          productsList = productsData.physical[currentSubcategory][currentSubsubcategory] || [];
+        } else {
+          // If no subsubcategory, show all subsubcategory products in the subcategory
+          productsList = Object.values(productsData.physical[currentSubcategory]).flat();
+        }
+      } else {
+        // No subcategory selected, show all physical products
+        productsList = Object.values(productsData.physical).flatMap(subcat => Object.values(subcat).flat());
+      }
+    }
+
+    // Filter by search term
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    if (searchTerm) {
+      productsList = productsList.filter(p => p.name.toLowerCase().includes(searchTerm));
+    }
+
+    // Filter by price
+    const maxPrice = parseFloat(priceFilter.value);
+    if (!isNaN(maxPrice)) {
+      productsList = productsList.filter(p => p.price <= maxPrice);
+    }
+
+    if (productsList.length === 0) {
+      mainContent.innerHTML = '<p>No products found matching your criteria.</p>';
+      return;
+    }
+
+    // Create product cards
+    productsList.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.className = 'product-card';
+
+      productCard.innerHTML = `
+        <img src="${product.image}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p class="price">${formatPrice(product.price)}</p>
+        <button aria-label="Add ${product.name} to cart" data-id="${product.id}">Add to Cart</button>
+      `;
+
+      productCard.querySelector('button').addEventListener('click', () => {
+        addToCart(product);
       });
-      ul.appendChild(li);
+
+      mainContent.appendChild(productCard);
     });
-    submenuDiv.appendChild(ul);
   }
 
-  virtualBtn.addEventListener('click', () => {
-    buildSubmenu('virtual');
-  });
-  physicalBtn.addEventListener('click', () => {
-    buildSubmenu('physical');
+  // Add product to cart
+  function addToCart(product) {
+    if (cart[product.id]) {
+      cart[product.id].quantity += 1;
+    } else {
+      cart[product.id] = { ...product, quantity: 1 };
+    }
+    updateCart();
+  }
+
+  // Remove product from cart
+  function removeFromCart(productId) {
+    delete cart[productId];
+    updateCart();
+  }
+
+  // Update cart display and total
+  function updateCart() {
+    cartItemsEl.innerHTML = '';
+
+    let total = 0;
+
+    Object.values(cart).forEach(item => {
+      total += item.price * item.quantity;
+      const cartItem = document.createElement('li');
+      cartItem.className = 'cart-item';
+      cartItem.innerHTML = `
+        <span>${item.name} (x${item.quantity})</span>
+        <span>${formatPrice(item.price * item.quantity)}</span>
+        <button aria-label="Remove ${item.name} from cart" data-id="${item.id}">Remove</button>
+      `;
+      cartItem.querySelector('button').addEventListener('click', () => {
+        removeFromCart(item.id);
+      });
+      cartItemsEl.appendChild(cartItem);
+    });
+
+    // Apply discount if promo used
+    if (promoUsed && !discountApplied) {
+      total *= 0.9; // 10% discount
+      discountApplied = true;
+      promoMsg.textContent = 'Promo code applied! 10% discount on your total.';
+      promoMsg.style.color = 'green';
+    }
+
+    checkoutTotal.textContent = `Total: ${formatPrice(total)}`;
+
+    if (Object.keys(cart).length === 0) {
+      promoMsg.textContent = '';
+      discountApplied = false;
+      promoUsed = false;
+      checkoutTotal.textContent = 'Total: $0.00';
+    }
+  }
+
+  // Promo code logic
+  promoBtn.addEventListener('click', () => {
+    const code = promoInput.value.trim().toLowerCase();
+    if (code === 'discount10') {
+      if (promoUsed) {
+        promoMsg.textContent = 'Promo code already used.';
+        promoMsg.style.color = 'red';
+      } else {
+        promoUsed = true;
+        discountApplied = false;
+        updateCart();
+      }
+    } else {
+      promoMsg.textContent = 'Invalid promo code.';
+      promoMsg.style.color = 'red';
+    }
   });
 
-  // On page load render all
+  // Search and filter events
+  searchInput.addEventListener('input', renderProducts);
+  priceFilter.addEventListener('input', renderProducts);
+
+  // Initial render
   renderProducts();
-
-})();
-</script>
-
+</script>  
 </body>
 </html>
